@@ -9,8 +9,46 @@ const heebo = Heebo({
 });
 
 export const metadata: Metadata = {
-  title: "iCaffeOS - CoffeeShops Operating System",
-  description: "מערכת ניהול והזמנות מתקדמת לבתי קפה - הדגמת חנות אונליין",
+  title: "שפת המדבר | משתלה ועגלת קפה",
+  description: "משתלה ועגלת קפה בלב גיתית. שפע פרחים, תבלינים, שיחים ועצים. בואו ליהנות מקפה מצוין באווירה מדברית קסומה.",
+  metadataBase: new URL('https://onlinestore-topaz.vercel.app'), // Placeholder, will update after deploy if needed, or use relative
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/icon.png',
+    apple: '/icon.png',
+  },
+  openGraph: {
+    title: "שפת המדבר | משתלה ועגלת קפה",
+    description: "בואו ליהנות מקפה מצוין באווירה מדברית קסומה. מכירת צמחים ופרחים לבית ולגן.",
+    url: '/nursery',
+    siteName: 'שפת המדבר',
+    images: [
+      {
+        url: '/og-image.png', // We copied logo.png here
+        width: 800,
+        height: 800,
+        alt: 'לוגו שפת המדבר',
+      },
+    ],
+    locale: 'he_IL',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "שפת המדבר - משתלה בלב המדבר",
+    description: "צמחים, קפה, ואווירה קסומה בגיתית.",
+    images: ['/og-image.png'],
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "application-name": "שפת המדבר",
+    "apple-mobile-web-app-title": "שפת המדבר",
+    "theme-color": "#7a8c6e",
+    "msapplication-navbutton-color": "#7a8c6e",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "msapplication-starturl": "/nursery",
+  }
 };
 
 export default function RootLayout({
