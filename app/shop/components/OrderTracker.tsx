@@ -57,7 +57,7 @@ export default function OrderTracker({ order, customer }: OrderTrackerProps) {
                 filter: `id=eq.${order.id}`
             }, (payload) => {
                 const newOrder = payload.new;
-                setLocalOrder(prev => ({ ...prev, ...newOrder }));
+                setLocalOrder((prev: any) => ({ ...prev, ...newOrder }));
                 if (newOrder.payment_screenshot_url) {
                     setUploadedUrl(newOrder.payment_screenshot_url);
                 }
