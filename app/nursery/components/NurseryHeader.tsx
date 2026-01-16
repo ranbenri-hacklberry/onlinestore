@@ -2,22 +2,15 @@
 
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 interface NurseryHeaderProps {
-    cartCount: number;
-    onCartClick: () => void;
-    activeOrder?: any;
-    onTrackClick?: () => void;
-    searchQuery: string;
-    onSearchChange: (query: string) => void;
+    searchQuery?: string;
+    onSearchChange?: (query: string) => void;
 }
 
 export default function NurseryHeader({
-    cartCount,
-    onCartClick,
-    activeOrder,
-    onTrackClick,
-    searchQuery,
+    searchQuery = '',
     onSearchChange
 }: NurseryHeaderProps) {
     const [scrolled, setScrolled] = useState(false);
@@ -48,17 +41,22 @@ export default function NurseryHeader({
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <img
+                            <Image
                                 src="/logo-text.png"
                                 alt="שפת המדבר"
-                                className="h-14 object-contain"
+                                width={120}
+                                height={56}
+                                className="h-14 w-auto object-contain"
                             />
                         </motion.div>
                     )}
 
                     {/* Hamburger Menu - Thinner, aligned with logo */}
                     <div className="md:hidden order-3 flex justify-end flex-1">
-                        <button className={`p-2 -ml-2 rounded-xl transition-colors ${scrolled ? 'text-white hover:bg-white/20' : 'text-white hover:bg-white/20'}`}>
+                        <button
+                            className={`p-2 -ml-2 rounded-xl transition-colors ${scrolled ? 'text-white hover:bg-white/20' : 'text-white hover:bg-white/20'}`}
+                            aria-label="תפריט"
+                        >
                             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-lg">
                                 <line x1="4" y1="12" x2="20" y2="12"></line>
                                 <line x1="4" y1="7" x2="20" y2="7"></line>
@@ -67,54 +65,33 @@ export default function NurseryHeader({
                         </button>
                     </div>
 
-                    {/* Left Actions (Desktop) */}
+                    {/* Desktop Actions */}
                     <div className="hidden md:flex items-center gap-3 order-3">
-                        {/* Track Order */}
-                        {activeOrder && (
-                            <motion.button
-                                onClick={onTrackClick}
-                                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-teal-100 text-teal-700 rounded-xl font-medium text-sm hover:bg-teal-200 transition-colors"
-                                animate={{
-                                    boxShadow: ['0 0 0 0 rgba(20, 184, 166, 0)', '0 0 0 8px rgba(20, 184, 166, 0.2)', '0 0 0 0 rgba(20, 184, 166, 0)']
-                                }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                            >
-                                <span className="animate-pulse">🚚</span>
-                                עקוב אחר ההזמנה
-                            </motion.button>
+                        {/* Search Input */}
+                        {onSearchChange && (
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => onSearchChange(e.target.value)}
+                                    placeholder="חיפוש..."
+                                    className="w-48 px-4 py-2 pr-10 bg-white/90 backdrop-blur-sm rounded-xl text-sm text-gray-700 placeholder-gray-400 border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                    aria-label="חיפוש צמחים"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+                            </div>
                         )}
 
                         {/* Phone */}
                         <motion.a
                             href="tel:+972556822072"
-                            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl font-medium text-sm hover:bg-emerald-200 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl font-medium text-sm hover:bg-emerald-200 transition-colors"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                         >
                             <span>📞</span>
                             ייעוץ חינם
                         </motion.a>
-
-                        {/* Cart Button - HIDDEN FOR CATALOG MODE
-                        <motion.button
-                            onClick={onCartClick}
-                            className="relative flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-bold shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            <span className="text-xl">🛒</span>
-                            <span className="hidden sm:inline">סל קניות</span>
-                            {cartCount > 0 && (
-                                <motion.span
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    className="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg"
-                                >
-                                    {cartCount}
-                                </motion.span>
-                            )}
-                        </motion.button>
-                        */}
                     </div>
                 </div>
             </div>

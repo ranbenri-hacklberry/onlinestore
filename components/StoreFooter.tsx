@@ -11,7 +11,7 @@ interface StoreFooterProps {
 const stores = [
     { id: 'shop', name: 'iCaffeOS', description: 'בית קפה', href: '/shop', icon: '☕', color: 'from-orange-500 to-amber-500' },
     { id: 'nursery', name: 'שפת המדבר', description: 'משתלה ועגלת קפה', href: '/nursery', icon: '🌿', color: 'from-emerald-500 to-teal-500' },
-    { id: 'bakery', name: 'לשה', description: 'מאפייה', href: '/bakery', icon: '🥐', color: 'from-amber-500 to-orange-500' },
+    { id: 'bakery', name: 'המאפייה', description: 'מאפים טריים', href: '/bakery', icon: '🥐', color: 'from-amber-500 to-orange-500' },
 ];
 
 export default function StoreFooter({ currentStore, accentColor = 'amber' }: StoreFooterProps) {

@@ -101,7 +101,7 @@ export default function BakeryHero() {
                             }}
                             transition={{ duration: 2, repeat: Infinity }}
                         >
-                            לשה
+                            המאפייה
                         </motion.span>
                         <span> - רוח אפייה</span>
                         <motion.span

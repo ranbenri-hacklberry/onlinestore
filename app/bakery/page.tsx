@@ -4,7 +4,6 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 // Components
-import BakeryHeader from './components/BakeryHeader';
 import BakeryHero from './components/BakeryHero';
 import BakeryCategoryFilter from './components/BakeryCategoryFilter';
 import BakeryProductCard from './components/BakeryProductCard';
@@ -189,7 +188,6 @@ const categoryMapping: Record<string, string> = {
 
 export default function BakeryPage() {
     const [activeCategory, setActiveCategory] = useState('all');
-    const [cartItems, setCartItems] = useState<any[]>([]);
 
     const filteredItems = useMemo(() => {
         if (activeCategory === 'all') return DEMO_PRODUCTS;
@@ -197,30 +195,13 @@ export default function BakeryPage() {
         return DEMO_PRODUCTS.filter(item => item.category === hebrewCategory);
     }, [activeCategory]);
 
-    const handleAddToCart = (item: any) => {
-        setCartItems(prev => {
-            const existing = prev.find(i => i.id === item.id);
-            if (existing) {
-                return prev.map(i =>
-                    i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-                );
-            }
-            return [...prev, { ...item, quantity: 1 }];
-        });
+    // Catalog mode - just log clicks
+    const handleProductClick = (item: any) => {
+        console.log('Product clicked:', item.name);
     };
-
-    const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-amber-50/50 to-white font-heebo" dir="rtl">
-            {/* Header */}
-            <BakeryHeader
-                cartCount={cartCount}
-                onCartClick={() => {
-                    console.log('Cart clicked', cartItems);
-                }}
-            />
-
             {/* Main Content */}
             <main className="max-w-[1600px] mx-auto">
                 {/* Hero */}
@@ -228,8 +209,21 @@ export default function BakeryPage() {
                     <BakeryHero />
                 </div>
 
+                {/* Vintage Title - Like עבודה עברית */}
+                <div className="text-center py-8">
+                    <span
+                        className="inline-block text-amber-700 text-2xl md:text-3xl font-serif tracking-widest px-8 py-3 border-2 border-amber-600 rounded-sm"
+                        style={{
+                            fontFamily: 'Georgia, "Times New Roman", serif',
+                            boxShadow: 'inset 0 0 0 3px white, inset 0 0 0 4px #d97706'
+                        }}
+                    >
+                        המַּאֲפִיָּה
+                    </span>
+                </div>
+
                 {/* Categories */}
-                <div className="sticky top-[72px] z-40 bg-white/95 backdrop-blur-md pt-2 pb-2 px-4 md:px-8 border-b border-amber-100 shadow-sm transition-all rounded-b-xl mb-4">
+                <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md pt-2 pb-2 px-4 md:px-8 border-b border-amber-100 shadow-sm transition-all rounded-b-xl mb-4">
                     <BakeryCategoryFilter
                         categories={DEMO_CATEGORIES}
                         activeCategory={activeCategory}
@@ -265,7 +259,7 @@ export default function BakeryPage() {
                             >
                                 <BakeryProductCard
                                     item={item}
-                                    onClick={handleAddToCart}
+                                    onClick={handleProductClick}
                                 />
                             </motion.div>
                         ))}
@@ -282,7 +276,7 @@ export default function BakeryPage() {
                         >
                             <span className="text-6xl mb-4 block">🌾</span>
                             <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                                לשה - רוח אפייה
+                                המאפייה - רוח אפייה
                             </h3>
                             <p className="text-gray-600 leading-relaxed max-w-2xl mx-auto">
                                 מאפייה מקומית תוצרת בית במצפה רמון. אנחנו מציעים מאפים נהדרים מחומרי גלם איכותיים,
@@ -317,25 +311,6 @@ export default function BakeryPage() {
 
             {/* Footer */}
             <StoreFooter currentStore="bakery" accentColor="amber" />
-
-            {/* Floating Cart Button (Mobile) */}
-            {cartCount > 0 && (
-                <motion.div
-                    className="lg:hidden fixed bottom-6 left-4 right-4 z-50"
-                    initial={{ y: 100 }}
-                    animate={{ y: 0 }}
-                >
-                    <button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 px-6 rounded-2xl font-bold text-lg shadow-2xl shadow-amber-500/40 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <span className="text-2xl">🛒</span>
-                            <span>צפייה בסל ({cartCount})</span>
-                        </div>
-                        <span className="bg-white/20 px-4 py-1 rounded-xl">
-                            ₪{cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)}
-                        </span>
-                    </button>
-                </motion.div>
-            )}
 
             {/* Version */}
             <div className="fixed bottom-1 left-2 text-[10px] text-gray-300 font-mono z-50 opacity-30 hover:opacity-100 transition-opacity pointer-events-none">

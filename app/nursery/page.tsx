@@ -37,9 +37,9 @@ export default function NurseryPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [plants, setPlants] = useState<Plant[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [activeCategory, setActiveCategory] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
-    const [cartItems, setCartItems] = useState<any[]>([]);
 
     // Fetch data from Supabase
     useEffect(() => {
@@ -57,11 +57,10 @@ export default function NurseryPage() {
 
                 if (catError) {
                     console.error('Error fetching categories:', catError);
+                    setError('שגיאה בטעינת הקטגוריות');
                 } else {
-                    console.log('📁 Loaded categories:', categoriesData?.length);
                     const cats = categoriesData || [];
                     setCategories(cats);
-                    // Set first category as active by default if not set
                     if (cats.length > 0 && !activeCategory) {
                         setActiveCategory(cats[0].id);
                     }
@@ -77,12 +76,13 @@ export default function NurseryPage() {
 
                 if (plantsError) {
                     console.error('Error fetching plants:', plantsError);
+                    setError('שגיאה בטעינת הצמחים');
                 } else {
-                    console.log('🌱 Loaded plants:', plantsData?.length);
                     setPlants(plantsData || []);
                 }
             } catch (e) {
                 console.error('Error loading data:', e);
+                setError('שגיאה בטעינת הנתונים');
             } finally {
                 setLoading(false);
             }
@@ -122,28 +122,15 @@ export default function NurseryPage() {
         return items;
     }, [activeCategory, plants, searchQuery]);
 
-    const handleAddToCart = (item: any) => {
-        setCartItems(prev => {
-            const existing = prev.find(i => i.id === item.id);
-            if (existing) {
-                return prev.map(i =>
-                    i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-                );
-            }
-            return [...prev, { ...item, quantity: 1 }];
-        });
+    // Handle plant click - just log for now (catalog mode)
+    const handlePlantClick = (plant: Plant) => {
+        console.log('Plant clicked:', plant.name);
     };
-
-    const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-emerald-50/50 to-white font-heebo" dir="rtl">
             {/* Header */}
             <NurseryHeader
-                cartCount={cartCount}
-                onCartClick={() => {
-                    console.log('Cart clicked', cartItems);
-                }}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
             />
@@ -223,11 +210,10 @@ export default function NurseryPage() {
                                     plant={{
                                         ...plant,
                                         in_stock: plant.is_in_stock !== false,
-                                        // Use placeholder image if none exists
-                                        image_url: plant.image_url || `https://images.unsplash.com/photo-1416879595882-3373a0480b5b?q=80&w=500&auto=format&fit=crop`
+                                        image_url: plant.image_url || undefined
                                     }}
                                     index={index}
-                                    onAddToCart={() => handleAddToCart(plant)}
+                                    onClick={() => handlePlantClick(plant)}
                                 />
                             ))}
                         </motion.div>

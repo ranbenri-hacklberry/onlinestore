@@ -30,7 +30,7 @@ export default function BakeryHeader({
                         </div>
                         <div className="hidden sm:block">
                             <h1 className="text-xl font-black text-amber-800 tracking-tight">
-                                לשה
+                                המאפייה
                             </h1>
                             <p className="text-xs text-amber-600 -mt-0.5">
                                 רוח אפייה
