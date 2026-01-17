@@ -1,39 +1,91 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+
+const images = [
+    '/cafe-images/גדר_פסיפלורה_סטייל.png',
+    '/cafe-images/לחם_מחמצת_בעבודת_יד.png',
+    '/cafe-images/ניוקי_שרימפס_ועשבי_תיבול.png',
+    '/cafe-images/טירמיסו_אישי_בכוס.png'
+];
 
 export default function StoreHero() {
+    const [currentImage, setCurrentImage] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentImage((prev) => (prev + 1) % images.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, []);
+
     return (
-        <div className="relative h-64 md:h-[400px] w-full overflow-hidden bg-gray-900 mx-auto w-full md:rounded-b-[2.5rem] shadow-2xl mb-8">
-            {/* Background Image */}
-            <div
-                className="absolute inset-0 bg-cover bg-center transform scale-105"
-                style={{
-                    backgroundImage: "url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2670&auto=format&fit=crop')",
-                    filter: 'brightness(0.8)'
-                }}
-            />
+        <div className="relative h-80 md:h-[550px] w-full overflow-hidden bg-white mx-auto md:rounded-b-[3.5rem] shadow-2xl mb-8 group">
+            {/* Background Slideshow */}
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={currentImage}
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.5 }}
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{
+                        backgroundImage: `url('${images[currentImage]}')`,
+                    }}
+                />
+            </AnimatePresence>
 
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+            {/* Elegant Dark Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
 
-            {/* Content */}
-            <div className="relative h-full flex flex-col justify-end p-6 md:p-12 max-w-7xl mx-auto text-white pb-10">
+            {/* Minimalist Floating Logo Container */}
+            <div className="relative h-full flex flex-col items-center justify-center text-center p-6 mt-4">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="flex flex-col items-center"
                 >
-                    <div className="inline-block px-3 py-1 bg-amber-500/20 backdrop-blur-md border border-amber-500/40 rounded-full text-amber-300 text-sm font-medium mb-3">
-                        ✨ פתוחים להזמנות
+                    {/* Floating Branding Circle */}
+                    <div className="bg-white/95 backdrop-blur-2xl p-4 md:p-8 rounded-full shadow-2xl border border-white/40 mb-6 flex flex-col items-center justify-center aspect-square min-w-[200px] md:min-w-[300px] overflow-hidden relative">
+                        <div className="relative w-full h-full flex items-center justify-center">
+                            <Image
+                                src="/brand/icaffe-icon-final.png"
+                                alt="iCaffe Icon"
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-black mb-3 leading-tight tracking-tight">
-                        חווית הקפה <span className="text-amber-400">החדשה שלכם</span> ☕
-                    </h1>
-                    <p className="text-lg md:text-2xl text-gray-200 max-w-xl font-light">
-                        הכירו את iCaffeOS - המערכת המושלמת להזמנה מהירה, תשלום מאובטח וצבירת נקודות בכל ביקור.
-                    </p>
+
+                    {/* Slogan Image - Transparent & Scaled */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.8, duration: 1 }}
+                        className="relative w-64 md:w-96 h-12 md:h-16 mt-2"
+                    >
+                        <Image
+                            src="/brand/icaffe-slogan-final.png"
+                            alt="בית קפה ודברים טובים לקחת"
+                            fill
+                            className="object-contain drop-shadow-2xl brightness-110 contrast-125"
+                        />
+                    </motion.div>
                 </motion.div>
+            </div>
+
+            {/* Image Indicators */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                {images.map((_, i) => (
+                    <div
+                        key={i}
+                        className={`h-1 transition-all duration-500 rounded-full ${i === currentImage ? 'w-8 bg-white' : 'w-2 bg-white/40'}`}
+                    />
+                ))}
             </div>
         </div>
     );
