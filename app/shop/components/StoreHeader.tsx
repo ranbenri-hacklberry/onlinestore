@@ -31,9 +31,9 @@ export default function StoreHeader({ cartCount, onCartClick, activeOrder, onTra
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.reload()}>
                 <div className="relative w-32 h-14 overflow-hidden">
                     <img
-                        src="/brand/icaffe-logo-final.png"
+                        src="/brand/icaffe-icon-final.png"
                         alt="iCaffe"
-                        className="object-contain w-full h-full"
+                        className="object-contain w-full h-full scale-150"
                     />
                 </div>
             </div>
