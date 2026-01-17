@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Phone, ArrowRight, ArrowLeft, Check, Loader2, Truck, Store, CreditCard, Banknote, Smartphone, Trash2, Plus, Minus } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
+import AddressSearch from './AddressSearch';
 
 interface CheckoutModalProps {
     isOpen: boolean;
@@ -245,15 +246,12 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                 />
 
                 {orderType === 'delivery' && (
-                    <motion.input
+                    <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        type="text"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        placeholder="כתובת מלאה (עיר, רחוב, מספר)"
-                        className="w-full h-14 bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 font-bold focus:border-orange-500 focus:bg-white outline-none"
-                    />
+                    >
+                        <AddressSearch onAddressChange={(details) => setAddress(details.formatted)} />
+                    </motion.div>
                 )}
             </div>
 
