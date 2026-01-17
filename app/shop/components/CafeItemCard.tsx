@@ -78,7 +78,7 @@ export default function CafeItemCard({ item, index = 0, onClick }: CafeItemCardP
                 </div>
 
                 {/* Content Area */}
-                <div className="p-5">
+                <div className="p-3 md:p-5">
                     {/* Category */}
                     {item.category && (
                         <div className="flex items-center gap-2 mb-2">
@@ -90,7 +90,7 @@ export default function CafeItemCard({ item, index = 0, onClick }: CafeItemCardP
                     )}
 
                     {/* Name */}
-                    <h3 className="text-lg font-bold text-gray-800 mb-1 group-hover:text-blue-600 transition-colors duration-300">
+                    <h3 className="text-base md:text-lg font-bold text-gray-800 mb-1 group-hover:text-blue-600 transition-colors duration-300 line-clamp-1">
                         {item.name}
                     </h3>
 
@@ -104,7 +104,7 @@ export default function CafeItemCard({ item, index = 0, onClick }: CafeItemCardP
                     {/* Footer / Price */}
                     <div className="flex items-center justify-between pt-3 border-t border-gray-50">
                         <div className="flex items-baseline gap-1">
-                            <span className="text-xl font-black text-gray-900">
+                            <span className="text-lg md:text-xl font-black text-gray-900">
                                 ₪{item.price}
                             </span>
                         </div>

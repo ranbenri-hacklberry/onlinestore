@@ -10,6 +10,7 @@ import MenuCategoryFilter from './components/MenuCategoryFilter';
 import StoreFooter from '@/components/StoreFooter';
 import CafeItemCard from './components/CafeItemCard';
 import WhatsAppButton from '@/app/nursery/components/WhatsAppButton';
+import ModifierModal from './components/ModifierModal';
 
 // Hooks & Libs
 import { supabase } from '@/lib/supabase';
@@ -22,6 +23,8 @@ const CafeCatalog = () => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isModifierOpen, setIsModifierOpen] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -86,7 +89,7 @@ const CafeCatalog = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white font-heebo" dir="rtl">
+    <div className="min-h-screen bg-white font-heebo overflow-x-hidden" dir="rtl">
       {/* Header */}
       <StoreHeader
         cartCount={0}
@@ -99,8 +102,8 @@ const CafeCatalog = () => {
         <StoreHero />
 
         {/* Categories */}
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="sticky top-[72px] z-40 bg-white/95 backdrop-blur-md py-4 border-b border-gray-100 mb-8">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 overflow-hidden">
+          <div className="sticky top-[72px] z-40 bg-white/95 backdrop-blur-md py-4 border-b border-gray-100 mb-8 w-full">
             <MenuCategoryFilter
               categories={displayCategories}
               activeCategory={activeCategory}
@@ -120,7 +123,7 @@ const CafeCatalog = () => {
 
           {/* Grid */}
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
+            className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -130,12 +133,24 @@ const CafeCatalog = () => {
                 key={item.id}
                 item={item}
                 index={index}
-                onClick={() => { }}
+                onClick={(item) => {
+                  setSelectedItem(item);
+                  setIsModifierOpen(true);
+                }}
               />
             ))}
           </motion.div>
         </div>
       </main>
+
+      {selectedItem && (
+        <ModifierModal
+          isOpen={isModifierOpen}
+          onClose={() => setIsModifierOpen(false)}
+          itemName={selectedItem.name}
+          itemPrice={selectedItem.price}
+        />
+      )}
 
       <StoreFooter currentStore="shop" accentColor="blue" />
 
