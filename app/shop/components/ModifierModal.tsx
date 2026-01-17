@@ -23,9 +23,10 @@ interface ModifierModalProps {
     itemId: string | number;
     itemName: string;
     itemPrice: number;
+    onConfirm: (selectedOptions: Record<string, any>) => void;
 }
 
-export default function ModifierModal({ isOpen, onClose, itemId, itemName, itemPrice }: ModifierModalProps) {
+export default function ModifierModal({ isOpen, onClose, itemId, itemName, itemPrice, onConfirm }: ModifierModalProps) {
     const [categories, setCategories] = useState<ModifierCategory[]>([]);
     const [loading, setLoading] = useState(false);
     const [selections, setSelections] = useState<Record<string, string>>({});
@@ -155,8 +156,8 @@ export default function ModifierModal({ isOpen, onClose, itemId, itemName, itemP
                                                     key={option.id}
                                                     onClick={() => handleSelect(category.id, option.id)}
                                                     className={`relative p-4 rounded-2xl border-2 transition-all duration-300 text-right group ${selections[category.id] === option.id
-                                                            ? 'border-blue-500 bg-blue-50/50 shadow-md'
-                                                            : 'border-gray-100 hover:border-gray-200 bg-white'
+                                                        ? 'border-blue-500 bg-blue-50/50 shadow-md'
+                                                        : 'border-gray-100 hover:border-gray-200 bg-white'
                                                         }`}
                                                 >
                                                     <div className="flex flex-col">
@@ -191,10 +192,27 @@ export default function ModifierModal({ isOpen, onClose, itemId, itemName, itemP
                         {/* Footer Action */}
                         <div className="p-6 border-t border-gray-100 bg-white/80 backdrop-blur-md absolute bottom-0 left-0 right-0">
                             <button
-                                onClick={onClose}
-                                className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-gray-200 active:scale-95 transition-transform"
+                                onClick={() => {
+                                    const selectedDetails: Record<string, any> = {};
+                                    categories.forEach(cat => {
+                                        const selectedOpt = cat.options.find(o => o.id === selections[cat.id]);
+                                        if (selectedOpt) {
+                                            selectedDetails[cat.id] = {
+                                                id: selectedOpt.id,
+                                                name: selectedOpt.label,
+                                                price: selectedOpt.price || 0
+                                            };
+                                        }
+                                    });
+                                    onConfirm(selectedDetails);
+                                }}
+                                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-orange-200 active:scale-95 transition-all flex items-center justify-between px-8"
                             >
-                                סגור והמשך
+                                <span>הוסף להזמנה</span>
+                                <span className="font-mono">₪{(itemPrice + Object.values(selections).reduce((acc: number, sel: any) => {
+                                    const opt = categories.flatMap(c => c.options).find(o => o.id === sel);
+                                    return acc + (opt?.price || 0);
+                                }, 0))}</span>
                             </button>
                         </div>
                     </motion.div>

@@ -11,6 +11,7 @@ import StoreFooter from '@/components/StoreFooter';
 import CafeItemCard from './components/CafeItemCard';
 import WhatsAppButton from '@/app/nursery/components/WhatsAppButton';
 import ModifierModal from './components/ModifierModal';
+import CheckoutModal from './components/CheckoutModal';
 
 // Hooks & Libs
 import { supabase } from '@/lib/supabase';
@@ -25,6 +26,43 @@ const CafeCatalog = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModifierOpen, setIsModifierOpen] = useState(false);
+
+  // Cart State
+  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
+  const addToCart = (item: any, selectedOptions: any) => {
+    const signature = JSON.stringify(selectedOptions);
+    setCartItems(prev => {
+      const existing = prev.find(i => i.id === item.id && i.signature === signature);
+      if (existing) {
+        return prev.map(i => i.id === item.id && i.signature === signature
+          ? { ...i, quantity: i.quantity + 1 }
+          : i
+        );
+      }
+      return [...prev, { ...item, quantity: 1, signature, selectedOptions }];
+    });
+    setIsModifierOpen(false);
+  };
+
+  const removeFromCart = (itemId: number | string, signature: string) => {
+    setCartItems(prev => prev.filter(i => !(i.id === itemId && i.signature === signature)));
+  };
+
+  const updateQuantity = (itemId: number | string, signature: string, delta: number) => {
+    setCartItems(prev => prev.map(i =>
+      i.id === itemId && i.signature === signature
+        ? { ...i, quantity: Math.max(1, i.quantity + delta) }
+        : i
+    ));
+  };
+
+  const cartCount = useMemo(() => cartItems.reduce((acc, item) => acc + item.quantity, 0), [cartItems]);
+  const cartTotal = useMemo(() => cartItems.reduce((acc, item) => {
+    const optionsPrice = Object.values(item.selectedOptions || {}).reduce((sum: number, opt: any) => sum + (opt.price || 0), 0);
+    return acc + (item.price + optionsPrice) * item.quantity;
+  }, 0), [cartItems]);
 
   useEffect(() => {
     async function fetchData() {
@@ -92,9 +130,9 @@ const CafeCatalog = () => {
     <div className="min-h-screen bg-white font-heebo overflow-x-hidden" dir="rtl">
       {/* Header */}
       <StoreHeader
-        cartCount={0}
-        onCartClick={() => { }}
-        hideCart={true}
+        cartCount={cartCount}
+        onCartClick={() => setIsCheckoutOpen(true)}
+        hideCart={false}
       />
 
       <main className="pb-32">
@@ -150,8 +188,18 @@ const CafeCatalog = () => {
           itemId={selectedItem.id}
           itemName={selectedItem.name}
           itemPrice={selectedItem.price}
+          onConfirm={(options) => addToCart(selectedItem, options)}
         />
       )}
+
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        cartItems={cartItems}
+        cartTotal={cartTotal}
+        onUpdateQuantity={updateQuantity}
+        onRemoveItem={removeFromCart}
+      />
 
       <StoreFooter currentStore="shop" accentColor="blue" />
 
