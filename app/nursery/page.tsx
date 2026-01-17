@@ -106,7 +106,17 @@ export default function NurseryPage() {
 
         // Filter by category
         if (activeCategory) {
-            items = items.filter(item => item.category_id === activeCategory);
+            const activeCat = categories.find(c => c.id === activeCategory);
+            if (activeCat?.name_he === 'שיחים ועצים') {
+                // If main "Trees & Shrubs" is selected, show everything that is tree-related
+                const treeRelatedCatIds = categories
+                    .filter(c => ['שיחים ועצים', 'שיחים', 'עצי נוי', 'עצי פרי'].includes(c.name_he))
+                    .map(c => c.id);
+                items = items.filter(item => treeRelatedCatIds.includes(item.category_id));
+            } else {
+                // Specific category (e.g., just "Fruit Trees")
+                items = items.filter(item => item.category_id === activeCategory);
+            }
         }
 
         // Filter by search query
@@ -120,7 +130,7 @@ export default function NurseryPage() {
         }
 
         return items;
-    }, [activeCategory, plants, searchQuery]);
+    }, [activeCategory, plants, categories, searchQuery]);
 
     // Handle plant click - just log for now (catalog mode)
     const handlePlantClick = (plant: Plant) => {

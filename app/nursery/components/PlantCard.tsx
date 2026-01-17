@@ -128,19 +128,39 @@ export default function PlantCard({ plant, index = 0, onClick }: PlantCardProps)
                         {plant.name}
                     </h3>
 
-                    {/* Description */}
-                    {plant.description && (
-                        <p className="text-sm text-gray-500 line-clamp-2 mb-3">
-                            {plant.description}
-                        </p>
-                    )}
+                    {/* Description or Sizes */}
+                    {(() => {
+                        try {
+                            const sizesData = JSON.parse(plant.description || '');
+                            if (typeof sizesData === 'object' && (sizesData['8L'] || sizesData['10L'] || sizesData['25L'])) {
+                                return (
+                                    <div className="flex flex-wrap gap-2 mb-3 mt-2">
+                                        {Object.entries(sizesData).map(([size, price]) => (
+                                            <div key={size} className="flex flex-col items-center bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 min-w-[50px]">
+                                                <span className="text-[10px] text-gray-400 font-medium uppercase">{size}</span>
+                                                <span className="text-xs font-bold text-emerald-700">₪{price as number}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                );
+                            }
+                        } catch (e) {
+                            // Focus on showing regular description
+                        }
+                        return plant.description && (
+                            <p className="text-sm text-gray-500 line-clamp-2 mb-3">
+                                {plant.description}
+                            </p>
+                        );
+                    })()}
 
-                    {/* Price Row */}
-                    <div className="flex items-center justify-between">
+                    {/* Price Row (Main Price) */}
+                    <div className="flex items-center justify-between border-t border-gray-50 pt-3">
                         <div className="flex items-baseline gap-1">
-                            <span className="text-2xl font-black text-emerald-600">
+                            <span className="text-xl font-black text-emerald-600">
                                 ₪{plant.price}
                             </span>
+                            <span className="text-[10px] text-gray-400 font-medium">החל מ-</span>
                         </div>
                     </div>
                 </div>
