@@ -6,11 +6,13 @@ import { useState, useEffect } from 'react';
 interface WhatsAppButtonProps {
     phoneNumber: string;
     message?: string;
+    className?: string;
 }
 
 export default function WhatsAppButton({
     phoneNumber,
-    message = 'שלום, אשמח לקבל מידע נוסף'
+    message = 'שלום, אשמח לקבל מידע נוסף',
+    className = "bottom-6 right-6"
 }: WhatsAppButtonProps) {
     const [hasBounced, setHasBounced] = useState(false);
 
@@ -31,7 +33,7 @@ export default function WhatsAppButton({
     return (
         <motion.button
             onClick={handleClick}
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 flex items-center justify-center bg-[#25D366] text-white rounded-full shadow-xl shadow-green-500/30 hover:shadow-green-500/50 transition-shadow"
+            className={`fixed z-50 w-14 h-14 flex items-center justify-center bg-[#25D366] text-white rounded-full shadow-xl shadow-green-500/30 hover:shadow-green-500/50 transition-shadow ${className}`}
             initial={{ scale: 0, opacity: 0 }}
             animate={{
                 scale: 1,

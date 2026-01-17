@@ -380,10 +380,20 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
         ];
 
         return (
-            <div className="space-y-8 py-4">
-                <div className="text-center space-y-2">
+            <div className="space-y-6 py-4">
+                {/* Mini Order Summary */}
+                <div className="bg-orange-50/50 border border-orange-100 rounded-2xl p-4 flex items-center justify-between">
+                    <div className="flex flex-col">
+                        <span className="text-xs font-bold text-orange-600 uppercase">פירוט הזמנה</span>
+                        <span className="text-sm font-black text-gray-700">{cartItems.length} פריטים {orderType === 'delivery' ? '(משלוח)' : '(איסוף)'}</span>
+                    </div>
+                    <div className="text-right">
+                        <span className="text-xl font-black text-gray-900">₪{cartTotal}</span>
+                    </div>
+                </div>
+
+                <div className="text-center space-y-1">
                     <h3 className="text-2xl font-black text-gray-900">בחירת תשלום</h3>
-                    <p className="text-gray-400 font-medium">איך תרצה לשלם על הפינוק?</p>
                 </div>
 
                 <div className="space-y-4">
@@ -488,34 +498,39 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
 
     const renderCreditCard = () => (
         <div className="space-y-6 animate-in fade-in duration-300">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-6 rounded-[2rem] text-white space-y-8 shadow-2xl relative overflow-hidden">
-                <div className="flex justify-between items-start">
-                    <div className="w-12 h-10 bg-yellow-400/30 rounded-lg backdrop-blur-sm border border-yellow-400/20" />
-                    <CreditCard size={24} className="opacity-50" />
-                </div>
-                <div className="space-y-4">
-                    <div className="text-xl font-mono tracking-[0.2em] font-bold">**** **** **** 4815</div>
-                    <div className="flex justify-between items-end">
-                        <div className="space-y-0.5">
-                            <span className="text-[10px] uppercase opacity-50 font-bold">בעל הכרטיס</span>
-                            <div className="font-bold">{customerName || 'שם מלא'}</div>
-                        </div>
-                        <div className="space-y-0.5 text-right">
-                            <span className="text-[10px] uppercase opacity-50 font-bold">תוקף</span>
-                            <div className="font-bold">08/29</div>
-                        </div>
-                    </div>
-                </div>
-                {/* Decorative chip circles */}
-                <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl text-xs" />
+            <div className="text-center space-y-2 mb-4">
+                <h3 className="text-xl font-black text-gray-900">הזנת כרטיס אשראי</h3>
+                <p className="text-gray-400 text-sm font-medium">הפרטים שלך מאובטחים ומוצפנים בסטנדרט הגבוה ביותר</p>
             </div>
 
             <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                    <input type="text" placeholder="תוקף" className="h-14 bg-gray-50 border-2 border-gray-100 rounded-xl px-4 text-center font-bold focus:border-blue-500 outline-none" />
-                    <input type="text" placeholder="CVV" className="h-14 bg-gray-50 border-2 border-gray-100 rounded-xl px-4 text-center font-bold focus:border-blue-500 outline-none" />
+                <div className="space-y-1.5">
+                    <label className="text-[10px] pr-2 text-gray-400 font-bold uppercase">מספר כרטיס</label>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="**** **** **** ****"
+                            className="w-full h-14 bg-gray-50 border-2 border-gray-100 rounded-xl px-4 font-mono font-bold tracking-widest text-center focus:border-blue-500 outline-none"
+                        />
+                        <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={20} />
+                    </div>
                 </div>
-                <input type="text" placeholder="מספר כרטיס" className="w-full h-14 bg-gray-50 border-2 border-gray-100 rounded-xl px-4 font-mono font-bold tracking-widest text-center focus:border-blue-500 outline-none" />
+
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] pr-2 text-gray-400 font-bold uppercase">תוקף</label>
+                        <input type="text" placeholder="MM/YY" className="w-full h-14 bg-gray-50 border-2 border-gray-100 rounded-xl px-4 text-center font-bold focus:border-blue-500 outline-none" />
+                    </div>
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] pr-2 text-gray-400 font-bold uppercase">CVV</label>
+                        <input type="text" placeholder="***" className="w-full h-14 bg-gray-50 border-2 border-gray-100 rounded-xl px-4 text-center font-bold focus:border-blue-500 outline-none" />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5">
+                    <label className="text-[10px] pr-2 text-gray-400 font-bold uppercase">שם בעל הכרטיס</label>
+                    <input type="text" value={customerName} placeholder="השם כפי שמופיע על הכרטיס" className="w-full h-14 bg-gray-50 border-2 border-gray-100 rounded-xl px-4 font-bold focus:border-blue-500 outline-none" />
+                </div>
 
                 <button
                     onClick={() => {
@@ -530,9 +545,9 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                             }
                         }, 2500);
                     }}
-                    className="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-xl shadow-xl shadow-blue-100 flex items-center justify-center gap-2"
+                    className="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-xl shadow-xl shadow-blue-100 flex items-center justify-center gap-2 mt-4"
                 >
-                    {loading ? <Loader2 className="animate-spin" /> : <><span>שלם ₪{cartTotal}</span><ArrowLeft size={20} /></>}
+                    {loading ? <Loader2 className="animate-spin" /> : <><span>אשר תשלום ₪{cartTotal}</span><ArrowLeft size={20} /></>}
                 </button>
                 {error && <div className="p-4 bg-red-50 text-red-500 text-sm font-bold rounded-xl text-center flex items-center justify-center gap-2">
                     <AlertCircle size={18} />
@@ -574,8 +589,15 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                         <span className="font-black">העלה צילום מסך של האישור</span>
                     </button>
                 ) : (
-                    <div className="relative group">
-                        <img src={screenshot} alt="Payment Screenshot" className="w-full h-64 object-cover rounded-[2rem] border-4 border-white shadow-xl" />
+                    <div className={`relative group p-2 rounded-[2.5rem] border-4 transition-all overflow-hidden ${aiError ? 'border-red-500 bg-red-50' : 'border-white shadow-xl'}`}>
+                        <div className="w-full h-64 overflow-y-auto custom-scrollbar rounded-[2rem]">
+                            <img src={screenshot} alt="Payment Screenshot" className="w-full object-contain" />
+                        </div>
+                        {aiError && (
+                            <div className="absolute inset-x-2 top-2 bottom-2 bg-red-500/10 rounded-[2rem] flex items-center justify-center pointer-events-none">
+                                <AlertCircle size={60} className="text-red-500 drop-shadow-lg" />
+                            </div>
+                        )}
                         <div className="absolute inset-0 bg-black/40 rounded-[2rem] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onClick={() => setScreenshot(null)} className="bg-white text-red-500 p-3 rounded-full shadow-xl">
                                 <Trash2 size={24} />
@@ -585,37 +607,49 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                 )}
 
                 {aiAnalyzing && (
-                    <div className="bg-orange-50 p-6 rounded-2xl flex items-center justify-center gap-4 text-orange-600">
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-orange-50 p-6 rounded-2xl flex items-center justify-center gap-4 text-orange-600 border border-orange-100"
+                    >
                         <Loader2 className="animate-spin" />
                         <span className="font-bold">ה-Gemini שלנו מנתח את את צילום המסך...</span>
-                    </div>
+                    </motion.div>
                 )}
 
                 {aiError && (
-                    <div className="bg-red-50 p-6 rounded-2xl space-y-3">
-                        <div className="flex items-center gap-3 text-red-500">
-                            <AlertCircle size={20} />
-                            <span className="font-bold">אופס! משהו לא קשור הועלה</span>
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="bg-red-50 p-6 rounded-2xl border-2 border-red-100 space-y-4"
+                    >
+                        <div className="flex items-center gap-3 text-red-600">
+                            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                <ImageIcon size={20} />
+                            </div>
+                            <span className="font-black text-lg">זיהוי נכשל!</span>
                         </div>
-                        <p className="text-sm text-red-400 font-medium leading-relaxed">
-                            נראה שהתמונה שהעלית אינה אישור תשלום תקין. אנא העלה את הצילום של אישור ההעברה ב-Bit/Paybox.
+                        <p className="text-sm text-red-500 font-bold leading-relaxed">
+                            נראה שהעלית תמונה של <span className="underline decoration-wavy">משהו טעים</span> (פסטה?), אבל המערכת מצפה לאישור העברה מ-Bit או PayBox.
+                            הצילום למעלה נדחה על ידי הבינה המלאכותית שלנו.
                         </p>
                         <button
-                            onClick={() => { setScreenshot(null); fileInputRef.current?.click(); }}
-                            className="text-white bg-red-500 px-4 py-2 rounded-xl text-xs font-bold"
+                            onClick={() => { setScreenshot(null); setTimeout(() => fileInputRef.current?.click(), 100); }}
+                            className="w-full bg-red-600 text-white py-3 rounded-xl font-black shadow-lg shadow-red-200 active:scale-95 transition-all flex items-center justify-center gap-2"
                         >
-                            נסה פעם נוספת
+                            <RotateCcw size={18} />
+                            <span>נסה להעלות צילום תקין</span>
                         </button>
-                    </div>
+                    </motion.div>
                 )}
 
                 <button
                     disabled={!screenshot || aiAnalyzing || aiError}
                     onClick={submitOrder}
-                    className="w-full h-16 bg-gray-900 disabled:bg-gray-100 text-white rounded-2xl font-black text-xl shadow-xl flex items-center justify-center gap-2"
+                    className="w-full h-16 bg-gray-900 disabled:bg-gray-100 text-white rounded-2xl font-black text-xl shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
-                    <span>שלם עכשיו</span>
-                    <Check size={24} />
+                    {aiAnalyzing ? <Loader2 className="animate-spin" /> : <span>שלם עכשיו</span>}
+                    {!aiAnalyzing && <Check size={24} />}
                 </button>
                 <button onClick={() => setStep('payment')} className="w-full text-gray-400 font-bold text-sm">ביטול וחזרה</button>
             </div>

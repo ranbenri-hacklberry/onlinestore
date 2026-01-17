@@ -12,6 +12,7 @@ import CafeItemCard from './components/CafeItemCard';
 import WhatsAppButton from '@/app/nursery/components/WhatsAppButton';
 import ModifierModal from './components/ModifierModal';
 import CheckoutModal from './components/CheckoutModal';
+import { ShoppingBag } from 'lucide-react';
 
 // Hooks & Libs
 import { supabase } from '@/lib/supabase';
@@ -206,7 +207,27 @@ const CafeCatalog = () => {
       <WhatsAppButton
         phoneNumber="+972556822072"
         message="שלום, אשמח להזמין מקום ב-iCaffe 🌱"
+        className="bottom-24 right-6"
       />
+
+      {/* Floating Cart Button */}
+      {cartCount > 0 && (
+        <motion.button
+          onClick={() => setIsCheckoutOpen(true)}
+          initial={{ scale: 0, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-orange-500 text-white rounded-full shadow-2xl shadow-orange-500/40 flex items-center justify-center border-4 border-white"
+        >
+          <div className="relative">
+            <ShoppingBag size={28} strokeWidth={2.5} />
+            <span className="absolute -top-3 -right-3 bg-white text-orange-600 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shadow-md border-2 border-orange-500">
+              {cartCount}
+            </span>
+          </div>
+        </motion.button>
+      )}
     </div>
   );
 };
