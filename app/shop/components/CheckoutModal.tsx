@@ -136,7 +136,16 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
             const { error: itemsErr } = await supabase.from('order_items').insert(itemInserts);
             if (itemsErr) throw itemsErr;
 
-            // 3. Update Stock (Decrement)
+            // 3. Notify Owner via SMS for manual payments (Bit/Paybox)
+            if (['bit', 'paybox'].includes(selectedPayment || '')) {
+                await supabase.from('sms_queue').insert({
+                    phone: '0548317887',
+                    message: `פייבוקס/ביט: קיבלת העברה חדשה מ-${customerName} בסך ₪${cartTotal} עבור הזמנה ${order.id.slice(0, 5)}`,
+                    status: 'pending'
+                });
+            }
+
+            // 4. Update Stock (Decrement)
             for (const item of cartItems) {
                 const { data: currentItem, error: fetchErr } = await supabase
                     .from('menu_items')
