@@ -49,30 +49,30 @@ export default function StoreHero() {
                     transition={{ duration: 1, ease: "easeOut" }}
                     className="flex flex-col items-center"
                 >
-                    {/* Floating Branding Circle */}
-                    <div className="bg-white/95 backdrop-blur-2xl p-4 md:p-8 rounded-full shadow-2xl border border-white/40 mb-6 flex flex-col items-center justify-center aspect-square min-w-[200px] md:min-w-[300px] overflow-hidden relative">
-                        <div className="relative w-full h-full flex items-center justify-center">
+                    {/* Floating Branding - NO CIRCLE, PURE LOGO */}
+                    <div className="relative flex flex-col items-center justify-center mb-8">
+                        <div className="relative w-64 h-64 md:w-[450px] md:h-[450px]">
                             <Image
                                 src="/brand/icaffe-icon-final.png"
                                 alt="iCaffe Icon"
                                 fill
-                                className="object-contain"
+                                className="object-contain drop-shadow-[0_10px_30px_rgba(255,255,255,0.2)]"
                             />
                         </div>
                     </div>
 
-                    {/* Slogan Image - Transparent & Scaled */}
+                    {/* Slogan Image - Floating below */}
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.8, duration: 1 }}
-                        className="relative w-64 md:w-96 h-12 md:h-16 mt-2"
+                        className="relative w-72 md:w-[500px] h-16 md:h-24 -mt-12 md:-mt-20"
                     >
                         <Image
                             src="/brand/icaffe-slogan-final.png"
                             alt="בית קפה ודברים טובים לקחת"
                             fill
-                            className="object-contain drop-shadow-2xl brightness-110 contrast-125"
+                            className="object-contain drop-shadow-2xl brightness-110"
                         />
                     </motion.div>
                 </motion.div>
