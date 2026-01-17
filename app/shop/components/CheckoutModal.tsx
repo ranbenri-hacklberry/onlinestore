@@ -50,16 +50,18 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             setGeneratedOtp(code);
 
-            // Insert into sms_queue
-            const { error: smsError } = await supabase
-                .from('sms_queue')
-                .insert({
-                    phone: phone,
-                    message: `קוד האימות שלך ל-iCaffe הוא: ${code} ☕ בתיאבון!`,
-                    status: 'pending'
-                });
+            // Don't send real SMS for the bypass phone
+            if (phone !== '0500000000') {
+                const { error: smsError } = await supabase
+                    .from('sms_queue')
+                    .insert({
+                        phone: phone,
+                        message: `קוד האימות שלך ל-iCaffe הוא: ${code} ☕ בתיאבון!`,
+                        status: 'pending'
+                    });
 
-            if (smsError) throw smsError;
+                if (smsError) throw smsError;
+            }
 
             setStep('otp');
         } catch (e) {
@@ -72,8 +74,9 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
 
     const handleVerifyOTP = () => {
         setLoading(true);
-        // Simulate verification against generated code (or hacky client-side check for now)
-        if (otp === generatedOtp || otp === '123456') { // 123456 as master bypass for testing
+        // Bypass for specific testing phone OR master bypass for testing
+        const isBypassPhone = phone === '0500000000' && otp === '123456';
+        if (otp === generatedOtp || otp === '123456' || isBypassPhone) {
             setStep('details');
         } else {
             setError('קוד שגוי. נסה שנית.');
