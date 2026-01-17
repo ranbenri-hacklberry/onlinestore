@@ -12,80 +12,83 @@ const images = [
 ];
 
 export default function StoreHero() {
-    const [currentImage, setCurrentImage] = useState(0);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setCurrentImage((prev) => (prev + 1) % images.length);
+            setCurrentImageIndex(prev => (prev + 1) % images.length);
         }, 5000);
         return () => clearInterval(timer);
     }, []);
 
     return (
-        <div className="relative h-80 md:h-[550px] w-full overflow-hidden bg-white mx-auto md:rounded-b-[3.5rem] shadow-2xl mb-8 group">
-            {/* Background Slideshow */}
-            <AnimatePresence mode="wait">
+        <div className="relative h-[400px] md:h-[500px] w-full overflow-hidden bg-white mb-8">
+            {/* Background Image Slideshow */}
+            {images.map((img, index) => (
                 <motion.div
-                    key={currentImage}
-                    initial={{ opacity: 0, scale: 1.1 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1.5 }}
+                    key={img}
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
-                        backgroundImage: `url('${images[currentImage]}')`,
+                        backgroundImage: `url('${img}')`
+                    }}
+                    initial={{ opacity: 0 }}
+                    animate={{
+                        opacity: currentImageIndex === index ? 1 : 0,
+                        scale: currentImageIndex === index ? 1 : 1.05
+                    }}
+                    transition={{
+                        opacity: { duration: 1.2 },
+                        scale: { duration: 6, ease: "linear" }
                     }}
                 />
-            </AnimatePresence>
+            ))}
 
-            {/* Elegant Dark Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+            {/* Right side shadow for logo - Exactly like Nursery */}
+            <div className="absolute inset-0 bg-gradient-to-l from-black/40 via-transparent to-transparent pointer-events-none z-[5]" />
 
-            {/* Minimalist Floating Logo Container */}
-            <div className="relative h-full flex flex-col items-center justify-center text-center p-6 mt-4">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className="flex flex-col items-center"
-                >
-                    {/* Floating Branding - NO CIRCLE, PURE LOGO */}
-                    <div className="relative flex flex-col items-center justify-center mb-8">
-                        <div className="relative w-64 h-64 md:w-[450px] md:h-[450px]">
-                            <Image
-                                src="/brand/icaffe-icon-final.png"
-                                alt="iCaffe Icon"
-                                fill
-                                className="object-contain drop-shadow-[0_10px_30px_rgba(255,255,255,0.2)]"
-                            />
-                        </div>
-                    </div>
+            {/* Bottom white fade */}
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none z-[5]" />
 
-                    {/* Slogan Image - Floating below */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.8, duration: 1 }}
-                        className="relative w-72 md:w-[500px] h-16 md:h-24 -mt-12 md:-mt-20"
-                    >
-                        <Image
-                            src="/brand/icaffe-slogan-final.png"
-                            alt="בית קפה ודברים טובים לקחת"
-                            fill
-                            className="object-contain drop-shadow-2xl brightness-110"
-                        />
-                    </motion.div>
-                </motion.div>
-            </div>
+            {/* Logo - Top Right - Mirroring the Nursery layout */}
+            <motion.div
+                className="absolute top-0 right-4 z-10 -mt-8"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+            >
+                <div className="relative w-48 h-48 md:w-80 md:h-80 drop-shadow-2xl">
+                    <Image
+                        src="/brand/icaffe-icon-final.png"
+                        alt="iCaffe"
+                        fill
+                        className="object-contain scale-[1.3] origin-center"
+                        priority
+                    />
+                </div>
+            </motion.div>
 
-            {/* Image Indicators */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            {/* Slide Indicators */}
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                 {images.map((_, i) => (
-                    <div
+                    <button
                         key={i}
-                        className={`h-1 transition-all duration-500 rounded-full ${i === currentImage ? 'w-8 bg-white' : 'w-2 bg-white/40'}`}
+                        onClick={() => setCurrentImageIndex(i)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${currentImageIndex === i
+                            ? 'bg-white w-6'
+                            : 'bg-white/50 hover:bg-white/70'
+                            }`}
                     />
                 ))}
+            </div>
+
+            {/* Bottom Wave SVG */}
+            <div className="absolute bottom-0 left-0 right-0 overflow-hidden pointer-events-none z-10">
+                <svg viewBox="0 0 1200 120" className="relative block w-full h-10 md:h-14" preserveAspectRatio="none">
+                    <path
+                        d="M0,60 C200,100 400,20 600,60 C800,100 1000,20 1200,60 L1200,120 L0,120 Z"
+                        fill="white"
+                    />
+                </svg>
             </div>
         </div>
     );
