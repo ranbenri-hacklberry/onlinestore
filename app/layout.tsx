@@ -11,7 +11,7 @@ const heebo = Heebo({
 export const metadata: Metadata = {
   title: "שפת המדבר | משתלה ועגלת קפה",
   description: "משתלה ועגלת קפה בלב גיתית. שפע פרחים, תבלינים, שיחים ועצים. בואו ליהנות מקפה מצוין באווירה מדברית קסומה.",
-  metadataBase: new URL('https://store.icaffeos.com'),
+  metadataBase: new URL('https://store.hacklberryfinn.com'),
   manifest: '/manifest.json',
   icons: {
     icon: '/icon.png',
