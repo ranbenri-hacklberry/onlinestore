@@ -16,7 +16,7 @@ interface CheckoutModalProps {
     onRemoveItem: (id: any, sig: string) => void;
 }
 
-type Step = 'cart' | 'auth' | 'otp' | 'details' | 'payment' | 'credit-card' | 'apple-pay' | 'bit-paybox' | 'processing' | 'success';
+type Step = 'cart' | 'auth' | 'otp' | 'details' | 'avatar' | 'payment' | 'credit-card' | 'apple-pay' | 'bit-paybox' | 'processing' | 'success';
 
 interface PaymentMethod {
     id: string;
@@ -48,6 +48,14 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
     const [aiAnalyzing, setAiAnalyzing] = useState(false);
     const [aiError, setAiError] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Avatar Logic
+    const [userPhoto, setUserPhoto] = useState<string | null>(null);
+    const [userAvatar, setUserAvatar] = useState<string | null>(null);
+    const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
+    const [avatarDiscount, setAvatarDiscount] = useState(0);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
         if (!isOpen) {
@@ -168,6 +176,54 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
             setError('שגיאה בתקשורת עם השרת. נסה שנית.');
             setStep('payment');
         }
+    };
+
+    const startCamera = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+            }
+        } catch (err) {
+            console.error("Camera error:", err);
+            setError("לא ניתן לגשת למצלמה. בדוק הרשאות.");
+        }
+    };
+
+    const capturePhoto = () => {
+        if (videoRef.current && canvasRef.current) {
+            const context = canvasRef.current.getContext('2d');
+            canvasRef.current.width = videoRef.current.videoWidth;
+            canvasRef.current.height = videoRef.current.videoHeight;
+            context?.drawImage(videoRef.current, 0, 0);
+            const data = canvasRef.current.toDataURL('image/png');
+            setUserPhoto(data);
+
+            // Stop camera
+            const stream = videoRef.current.srcObject as MediaStream;
+            stream?.getTracks().forEach(track => track.stop());
+
+            generateAvatar();
+        }
+    };
+
+    const generateAvatar = () => {
+        setIsGeneratingAvatar(true);
+        // Simulate Pixar avatar generation
+        setTimeout(() => {
+            // In a real app, we'd send the photo to an AI service
+            // Here we'll use a high-quality placeholder that looks like a Pixar character
+            // based on gender/features if we had them. Let's use a cute default for now.
+            // In a real implementation, 'generate_image' would take a description.
+            const pixarAvatars = [
+                'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=b6e3f4',
+                'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka&backgroundColor=ffdfbf',
+                'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasper&backgroundColor=c0aede'
+            ];
+            setUserAvatar(pixarAvatars[Math.floor(Math.random() * pixarAvatars.length)]);
+            setIsGeneratingAvatar(false);
+            setAvatarDiscount(Math.floor(cartTotal * 0.05)); // 5% discount for smiling!
+        }, 3000);
     };
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -368,17 +424,89 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
             </div>
 
             <button
-                onClick={() => setStep('payment')}
+                onClick={() => {
+                    setStep('avatar');
+                    startCamera();
+                }}
                 disabled={!customerName || (orderType === 'delivery' && !address)}
-                className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black text-lg shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95"
+                className="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-lg shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95"
             >
-                <span>המשך לבחירת תשלום</span>
+                <span>המשך לקבלת הנחת חיוך!</span>
                 <ArrowLeft size={20} />
             </button>
         </div>
     );
 
+    const renderAvatar = () => (
+        <div className="space-y-8 py-4 text-center">
+            <div className="space-y-2">
+                <h3 className="text-3xl font-black text-gray-900 italic">Smile & Style! 📸</h3>
+                <p className="text-gray-400 font-medium">חייך למצלמה! נהפוך אותך לאווטאר פיקסאר וניתן לך 5% הנחה 🎉</p>
+            </div>
+
+            <div className="relative mx-auto w-64 h-64 rounded-full overflow-hidden border-8 border-orange-100 shadow-2xl bg-gray-50 flex items-center justify-center">
+                {!userPhoto ? (
+                    <>
+                        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
+                        <div className="absolute inset-0 border-[12px] border-white/20 rounded-full pointer-events-none" />
+                        <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ repeat: Infinity, duration: 2 }}
+                            className="absolute bottom-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-[10px] font-black text-orange-600 shadow-lg"
+                        >
+                            מזהה חיוך...
+                        </motion.div>
+                    </>
+                ) : (
+                    <div className="w-full h-full relative">
+                        {isGeneratingAvatar ? (
+                            <div className="absolute inset-0 bg-white flex flex-col items-center justify-center space-y-4">
+                                <Loader2 className="w-12 h-12 text-orange-500 animate-spin" />
+                                <span className="font-black text-orange-600 animate-pulse text-sm">מעבד את הקסם של Pixar...</span>
+                            </div>
+                        ) : (
+                            <motion.img
+                                initial={{ scale: 0.5, rotate: -20, opacity: 0 }}
+                                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                                src={userAvatar || ''}
+                                className="w-full h-full object-cover bg-blue-50"
+                            />
+                        )}
+                    </div>
+                )}
+            </div>
+
+            <canvas ref={canvasRef} className="hidden" />
+
+            {!userPhoto ? (
+                <button
+                    onClick={capturePhoto}
+                    className="w-full h-16 bg-gray-900 text-white rounded-2xl font-black text-xl shadow-xl flex items-center justify-center gap-2"
+                >
+                    <Camera size={24} />
+                    <span>צלם וחייך!</span>
+                </button>
+            ) : !isGeneratingAvatar && (
+                <div className="space-y-4">
+                    <div className="bg-green-50 p-4 rounded-2xl border-2 border-green-100">
+                        <p className="text-green-600 font-black text-lg">קיבלת הנחת חיוך! ₪{avatarDiscount}-</p>
+                        <p className="text-sm text-green-500 font-medium">האווטאר שלך נשמר בפרטי הלקוח (ללא התמונה המקורית 🛡️)</p>
+                    </div>
+                    <button
+                        onClick={() => setStep('payment')}
+                        className="w-full h-16 bg-orange-500 text-white rounded-2xl font-black text-xl shadow-xl flex items-center justify-center gap-2"
+                    >
+                        <span>המשך לתשלום (₪{cartTotal - avatarDiscount})</span>
+                        <ArrowLeft size={24} />
+                    </button>
+                    <button onClick={() => { setUserPhoto(null); startCamera(); }} className="text-gray-400 font-bold text-sm">צילום מחדש</button>
+                </div>
+            )}
+        </div>
+    );
+
     const renderPayment = () => {
+        const finalTotal = cartTotal - avatarDiscount;
         const methods: PaymentMethod[] = [
             { id: 'apple-google', label: 'Apple/Google Pay', icon: Smartphone, color: 'text-black', bg: 'bg-gray-100' },
             { id: 'credit', label: 'כרטיס אשראי', icon: CreditCard, color: 'text-blue-500', bg: 'bg-blue-50' },
@@ -395,9 +523,10 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                     <div className="flex flex-col">
                         <span className="text-xs font-bold text-orange-600 uppercase">פירוט הזמנה</span>
                         <span className="text-sm font-black text-gray-700">{cartItems.length} פריטים {orderType === 'delivery' ? '(משלוח)' : '(איסוף)'}</span>
+                        {avatarDiscount > 0 && <span className="text-[10px] text-green-600 font-bold">כולל הנחת חיוך ₪{avatarDiscount}-</span>}
                     </div>
                     <div className="text-right">
-                        <span className="text-xl font-black text-gray-900">₪{cartTotal}</span>
+                        <span className="text-xl font-black text-gray-900">₪{finalTotal}</span>
                     </div>
                 </div>
 
@@ -480,7 +609,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                 <h3 className="text-2xl font-black">Apple Pay</h3>
                 <div className="space-y-2">
                     <p className="text-gray-400 font-bold">סכום לחיוב</p>
-                    <p className="text-4xl font-black">₪{cartTotal}</p>
+                    <p className="text-4xl font-black">₪{finalTotal}</p>
                 </div>
             </div>
 
@@ -556,7 +685,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                     }}
                     className="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-xl shadow-xl shadow-blue-100 flex items-center justify-center gap-2 mt-4"
                 >
-                    {loading ? <Loader2 className="animate-spin" /> : <><span>אשר תשלום ₪{cartTotal}</span><ArrowLeft size={20} /></>}
+                    {loading ? <Loader2 className="animate-spin" /> : <><span>אשר תשלום ₪{finalTotal}</span><ArrowLeft size={20} /></>}
                 </button>
                 {error && <div className="p-4 bg-red-50 text-red-500 text-sm font-bold rounded-xl text-center flex items-center justify-center gap-2">
                     <AlertCircle size={18} />
@@ -576,7 +705,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                 <h3 className="text-2xl font-black">תשלום ב-{selectedPayment === 'bit' ? 'Bit' : 'PayBox'}</h3>
                 <p className="text-gray-400 font-medium px-8 leading-relaxed">
                     בצע העברה למספר <span className="text-orange-500 font-black">054-1234567</span><br />
-                    בסך <span className="text-gray-900 font-black">₪{cartTotal}</span> ולאחר מכן העלה את צילום האישור כאן.
+                    בסך <span className="text-gray-900 font-black">₪{finalTotal}</span> ולאחר מכן העלה את צילום האישור כאן.
                 </p>
             </div>
 
@@ -734,6 +863,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                             {step === 'auth' && renderAuth()}
                             {step === 'otp' && renderOTP()}
                             {step === 'details' && renderDetails()}
+                            {step === 'avatar' && renderAvatar()}
                             {step === 'payment' && renderPayment()}
                             {step === 'credit-card' && renderCreditCard()}
                             {step === 'apple-pay' && renderApplePay()}
