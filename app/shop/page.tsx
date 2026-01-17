@@ -147,6 +147,7 @@ const CafeCatalog = () => {
         <ModifierModal
           isOpen={isModifierOpen}
           onClose={() => setIsModifierOpen(false)}
+          itemId={selectedItem.id}
           itemName={selectedItem.name}
           itemPrice={selectedItem.price}
         />

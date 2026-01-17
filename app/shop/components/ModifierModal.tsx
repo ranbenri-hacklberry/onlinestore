@@ -1,8 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check } from 'lucide-react';
-import { useState } from 'react';
+import { X, Check, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 interface ModifierOption {
     id: string;
@@ -19,49 +20,81 @@ interface ModifierCategory {
 interface ModifierModalProps {
     isOpen: boolean;
     onClose: () => void;
+    itemId: string | number;
     itemName: string;
     itemPrice: number;
 }
 
-const DRINK_MODIFIERS: ModifierCategory[] = [
-    {
-        id: 'milk',
-        title: 'סוג חלב',
-        options: [
-            { id: 'regular', label: 'רגיל' },
-            { id: 'soy', label: 'סויה', price: 2 },
-            { id: 'oat', label: 'שיבולת שועל', price: 3 },
-            { id: 'almond', label: 'שקדים', price: 3 },
-        ]
-    },
-    {
-        id: 'strength',
-        title: 'חוזק',
-        options: [
-            { id: 'weak', label: 'חלש' },
-            { id: 'normal', label: 'רגיל' },
-            { id: 'strong', label: 'חזק' },
-            { id: 'double', label: 'כפול' },
-        ]
-    },
-    {
-        id: 'sugar',
-        title: 'סוכר',
-        options: [
-            { id: 'none', label: 'ללא' },
-            { id: '0.5', label: 'חצי סוכר' },
-            { id: '1', label: '1 סוכר' },
-            { id: 'sweetener', label: 'סוכרזית' },
-        ]
-    }
-];
+export default function ModifierModal({ isOpen, onClose, itemId, itemName, itemPrice }: ModifierModalProps) {
+    const [categories, setCategories] = useState<ModifierCategory[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [selections, setSelections] = useState<Record<string, string>>({});
 
-export default function ModifierModal({ isOpen, onClose, itemName, itemPrice }: ModifierModalProps) {
-    const [selections, setSelections] = useState<Record<string, string>>({
-        milk: 'regular',
-        strength: 'normal',
-        sugar: 'none'
-    });
+    useEffect(() => {
+        if (isOpen && itemId) {
+            fetchModifiers();
+        }
+    }, [isOpen, itemId]);
+
+    const fetchModifiers = async () => {
+        setLoading(true);
+        try {
+            // 1. Get linked groups
+            const { data: links } = await supabase
+                .from('menuitemoptions')
+                .select('group_id')
+                .eq('item_id', itemId);
+
+            if (!links || links.length === 0) {
+                setCategories([]);
+                setLoading(false);
+                return;
+            }
+
+            const groupIds = links.map(l => l.group_id);
+
+            // 2. Get categories and options
+            const { data: groups } = await supabase
+                .from('optiongroups')
+                .select('*')
+                .in('id', groupIds)
+                .order('display_order', { ascending: true });
+
+            const { data: values } = await supabase
+                .from('optionvalues')
+                .select('*')
+                .in('group_id', groupIds)
+                .order('display_order', { ascending: true });
+
+            if (groups && values) {
+                const formatted: ModifierCategory[] = groups.map(g => ({
+                    id: g.id,
+                    title: g.name,
+                    options: values
+                        .filter(v => v.group_id === g.id)
+                        .map(v => ({
+                            id: v.id,
+                            label: v.value_name,
+                            price: v.price_adjustment > 0 ? v.price_adjustment : undefined
+                        }))
+                }));
+                setCategories(formatted);
+
+                // Set defaults (first option of each category)
+                const defaults: Record<string, string> = {};
+                formatted.forEach(cat => {
+                    if (cat.options.length > 0) {
+                        defaults[cat.id] = cat.options[0].id;
+                    }
+                });
+                setSelections(defaults);
+            }
+        } catch (e) {
+            console.error('Error fetching modifiers:', e);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSelect = (categoryId: string, optionId: string) => {
         setSelections(prev => ({ ...prev, [categoryId]: optionId }));
@@ -92,7 +125,7 @@ export default function ModifierModal({ isOpen, onClose, itemName, itemPrice }: 
                         <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
                             <div className="text-right">
                                 <h3 className="text-xl font-black text-gray-900 leading-tight">{itemName}</h3>
-                                <p className="text-sm text-blue-500 font-bold">החלב והסוכר עלינו</p>
+                                <p className="text-sm text-blue-500 font-bold">התאמה אישית</p>
                             </div>
                             <button
                                 onClick={onClose}
@@ -104,44 +137,55 @@ export default function ModifierModal({ isOpen, onClose, itemName, itemPrice }: 
 
                         {/* Options Body */}
                         <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-32">
-                            {DRINK_MODIFIERS.map((category) => (
-                                <div key={category.id} className="space-y-4">
-                                    <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                                        {category.title}
-                                    </h4>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {category.options.map((option) => (
-                                            <button
-                                                key={option.id}
-                                                onClick={() => handleSelect(category.id, option.id)}
-                                                className={`relative p-4 rounded-2xl border-2 transition-all duration-300 text-right group ${selections[category.id] === option.id
-                                                        ? 'border-blue-500 bg-blue-50/50 shadow-md'
-                                                        : 'border-gray-100 hover:border-gray-200 bg-white'
-                                                    }`}
-                                            >
-                                                <div className="flex flex-col">
-                                                    <span className={`font-bold ${selections[category.id] === option.id ? 'text-blue-600' : 'text-gray-700'
-                                                        }`}>
-                                                        {option.label}
-                                                    </span>
-                                                    {option.price && (
-                                                        <span className="text-[10px] text-gray-400">+ ₪{option.price}</span>
-                                                    )}
-                                                </div>
-                                                {selections[category.id] === option.id && (
-                                                    <motion.div
-                                                        layoutId={`check-${category.id}`}
-                                                        className="absolute top-2 left-2 text-blue-500"
-                                                    >
-                                                        <Check size={16} strokeWidth={3} />
-                                                    </motion.div>
-                                                )}
-                                            </button>
-                                        ))}
-                                    </div>
+                            {loading ? (
+                                <div className="flex flex-col items-center justify-center py-20 gap-4">
+                                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+                                    <p className="text-gray-400 font-medium">טוען אפשרויות...</p>
                                 </div>
-                            ))}
+                            ) : categories.length > 0 ? (
+                                categories.map((category) => (
+                                    <div key={category.id} className="space-y-4">
+                                        <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                                            {category.title}
+                                        </h4>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {category.options.map((option) => (
+                                                <button
+                                                    key={option.id}
+                                                    onClick={() => handleSelect(category.id, option.id)}
+                                                    className={`relative p-4 rounded-2xl border-2 transition-all duration-300 text-right group ${selections[category.id] === option.id
+                                                            ? 'border-blue-500 bg-blue-50/50 shadow-md'
+                                                            : 'border-gray-100 hover:border-gray-200 bg-white'
+                                                        }`}
+                                                >
+                                                    <div className="flex flex-col">
+                                                        <span className={`font-bold ${selections[category.id] === option.id ? 'text-blue-600' : 'text-gray-700'
+                                                            }`}>
+                                                            {option.label}
+                                                        </span>
+                                                        {option.price && (
+                                                            <span className="text-[10px] text-gray-400 font-bold">+ ₪{option.price}</span>
+                                                        )}
+                                                    </div>
+                                                    {selections[category.id] === option.id && (
+                                                        <motion.div
+                                                            layoutId={`check-${category.id}`}
+                                                            className="absolute top-2 left-2 text-blue-500"
+                                                        >
+                                                            <Check size={16} strokeWidth={3} />
+                                                        </motion.div>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-10">
+                                    <p className="text-gray-400">חוויה קלאסית - אין תוספות למנה זו</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Footer Action */}
