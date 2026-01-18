@@ -27,17 +27,16 @@ export const analyzeImageTraits = async (base64String, apiKey = null) => {
     const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
     const base64Data = mimeMatch ? mimeMatch[2] : (base64String.includes('base64,') ? base64String.split('base64,')[1] : base64String);
 
-    const prompt = `Task: High-fidelity Scene & Subject analysis for a 3D portrait.
+    const prompt = `Task: High-fidelity visual analysis of all subjects in the image.
     PRECISION REQUIREMENTS:
-    1. SUBJECTS: Identify ALL subjects (People, Pets, etc.). For each person, describe Hair, Facial Hair, and Gender.
-    2. GENDER: Explicitly state "Male", "Female", or "Non-binary" based on visual traits. DO NOT DEFAULT TO MALE.
-    3. HAIR: Specify style clearly (e.g., "Bald", "Long Curly", "Short").
-    4. AGE: Estimate apparent age naturally (do not force youth).
-    5. PETS: If a pet is present (Dog, Cat, etc.), describe its breed and color.
+    1. SUBJECTS: Identify ALL subjects (People, Pets, etc.). 
+    2. HUMANS: If a person is present, describe Gender, Hair, and Age. If NO person is present, explicitly state "NO human subjects".
+    3. PETS: If a pet is present, describe breed, color, and pose (lying, sitting, etc.).
+    4. GENDER: DO NOT DEFAULT TO MALE. Detect accurately.
     No preamble, English, max 60 words.`;
 
     try {
-        console.log("👁️ [Vision] Analyzing Scene & Subjects...");
+        console.log("👁️ [Vision] Analyzing subjects accurately...");
         const result = await model.generateContent([
             { text: prompt },
             { inlineData: { data: base64Data, mimeType: mimeType } }
@@ -47,7 +46,7 @@ export const analyzeImageTraits = async (base64String, apiKey = null) => {
         return text;
     } catch (error) {
         console.warn('⚠️ [Vision] Fallback:', error.message);
-        return "Adult subject, short hair, neutral expression";
+        return "Subject from the photo, accurate representation";
     }
 };
 
@@ -63,7 +62,7 @@ export const generateImageWithGemini = async (traits, name = 'someone', style = 
         anime: "Studio Ghibli style hand-drawn anime portrait, beautiful watercolor textures, expressive eyes, peaceful whimsical atmosphere, masterpiece.",
         cyberpunk: "Cyberpunk 2077 aesthetic, futuristic neon lighting, glowing accents, cinematic street background, detailed cybernetics.",
         sketch: "Detailed hand-drawn pencil sketch, charcoal textures, elegant line art on textured paper.",
-        claymation: "Stop-motion claymation style like Wallace & Gromit, realistic clay textures, tactile and charming 3D look."
+        claymation: "Stop-motion claymation style, realistic clay textures, tactile and charming 3D look.",
     };
 
     const selectedStyle = stylePrompts[style] || stylePrompts.pixar;
@@ -72,11 +71,11 @@ export const generateImageWithGemini = async (traits, name = 'someone', style = 
         const finalPrompt = `${selectedStyle}
         SUBJECTS TO RENDER: ${traits}.
         ${customPrompt ? `ADDITIONAL USER INSTRUCTIONS: ${customPrompt}.` : ''}
-        CRITICAL STYLE RULES:
-        - FIDELITY: Respect the detected Gender, Age, and Subjects (including Pets) strictly.
-        - HEAD HAIR: Render exactly as described.
-        SCENE DETAILS: hyper-detailed textures, 1024x1024 resolution, 8k masterpiece, bokeh blurred background. 
-        COMPOSITION: Feature all subjects described (Group shot if multiple subjects).`;
+        CRITICAL RULES:
+        - STRICT COMPOSITION: Render ONLY the subjects mentioned in TRAITS. 
+        - NO HUMANS: If traits state "NO human subjects", DO NOT include any humans in the image. This is mandatory.
+        - FIDELITY: Respect Gender, Age, and Pose (lying down, etc.) exactly as described.
+        SCENE DETAILS: 1024x1024 resolution, 8k masterpiece, bokeh blurred background.`;
 
         console.log(`🎨 [Imagen 3] Rendering ${style} scene for: ${name}...`);
         const model = genAI.getGenerativeModel({
