@@ -63,7 +63,7 @@ export default function NurseryCategoryFilter({
                             key={category.id}
                             onClick={() => onCategoryChange(category.id)}
                             className={`
-                                relative flex items-center justify-center px-3 md:px-5 py-1.5 rounded-lg font-chalk transition-all duration-300
+                                relative flex items-center justify-center px-5 md:px-6 py-1.5 rounded-lg font-chalk transition-all duration-300
                                 ${isActive
                                     ? 'bg-[#7a8c6e] text-white shadow-md'
                                     : 'bg-[#7a8c6e]/10 text-[#7a8c6e] hover:bg-[#7a8c6e]/20 border border-[#7a8c6e]/20'
@@ -75,13 +75,13 @@ export default function NurseryCategoryFilter({
                             whileTap={{ scale: 0.95 }}
                         >
                             {hasMultipleWords ? (
-                                <div className="flex flex-col items-center text-lg md:text-xl leading-[0.85] w-full text-center">
+                                <div className="flex flex-col items-center text-2xl md:text-3xl leading-[0.85] w-full text-center">
                                     {nameParts.map((part, i) => (
                                         <span key={i}>{part}</span>
                                     ))}
                                 </div>
                             ) : (
-                                <span className="text-lg md:text-xl px-1">{category.name}</span>
+                                <span className="text-2xl md:text-3xl px-1">{category.name}</span>
                             )}
                         </motion.button>
                     );
