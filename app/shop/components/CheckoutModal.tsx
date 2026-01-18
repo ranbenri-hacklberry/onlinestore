@@ -231,7 +231,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                 is_paid: false
             };
 
-            await db.orders.put(newOrder);
+            await db.table('orders').put(newOrder);
 
             // 3. Prepare Items Record for Dexie
             const itemInserts = cartItems.map((item, idx) => ({
@@ -243,7 +243,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                 mods: Object.values(item.selectedOptions || {}).map((opt: any) => opt.name || opt),
                 item_status: 'new'
             }));
-            await db.order_items.bulkPut(itemInserts);
+            await db.table('order_items').bulkPut(itemInserts);
 
             // 4. Queue Sync Action (Bypasses RLS via submit_order_v3 RPC)
             await queueAction('CREATE_ORDER', {
