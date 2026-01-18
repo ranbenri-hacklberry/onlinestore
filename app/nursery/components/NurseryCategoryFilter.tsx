@@ -49,7 +49,7 @@ export default function NurseryCategoryFilter({
     return (
         <div className="flex flex-col items-center gap-4 w-full">
             {/* Main Categories */}
-            <div className="flex justify-center flex-wrap gap-1.5 py-1 px-1">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:flex lg:justify-center lg:flex-wrap gap-2 w-full px-2">
                 {displayCategories.map((category, index) => {
                     const isActive = category.id === activeCategory ||
                         (category.name === 'שיחים ועצים' && isTreeRelatedActive);
@@ -63,7 +63,7 @@ export default function NurseryCategoryFilter({
                             key={category.id}
                             onClick={() => onCategoryChange(category.id)}
                             className={`
-                                relative flex items-center justify-center px-5 md:px-6 py-1.5 rounded-lg font-chalk transition-all duration-300
+                                relative flex items-center justify-center px-1 py-2 rounded-lg font-chalk transition-all duration-300 w-full h-full min-h-[60px]
                                 ${isActive
                                     ? 'bg-[#7a8c6e] text-white shadow-md'
                                     : 'bg-[#7a8c6e]/10 text-[#7a8c6e] hover:bg-[#7a8c6e]/20 border border-[#7a8c6e]/20'
@@ -75,7 +75,7 @@ export default function NurseryCategoryFilter({
                             whileTap={{ scale: 0.95 }}
                         >
                             {hasMultipleWords ? (
-                                <div className="flex flex-col items-center text-2xl md:text-3xl leading-[0.85] w-full text-center">
+                                <div className="flex flex-col items-center justify-center text-2xl md:text-3xl leading-[0.85] w-full text-center">
                                     {nameParts.map((part, i) => (
                                         <span key={i}>{part}</span>
                                     ))}
