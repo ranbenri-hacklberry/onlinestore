@@ -107,7 +107,7 @@ const CafeCatalog = () => {
 
         // CHECK FOR ACTIVE ORDER
         const { db } = await import('@/db/database');
-        const latestOrder = await db.orders.orderBy('created_at').reverse().first();
+        const latestOrder = await db.table('orders').orderBy('created_at').reverse().first();
         if (latestOrder && latestOrder.order_status !== 'delivered') {
           setActiveOrder(latestOrder);
           setShowTracking(true);
