@@ -27,16 +27,17 @@ export const analyzeImageTraits = async (base64String, apiKey = null) => {
     const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
     const base64Data = mimeMatch ? mimeMatch[2] : (base64String.includes('base64,') ? base64String.split('base64,')[1] : base64String);
 
-    const prompt = `Task: High-fidelity character analysis for a 3D portrait.
+    const prompt = `Task: High-fidelity Scene & Subject analysis for a 3D portrait.
     PRECISION REQUIREMENTS:
-    1. HEAD HAIR: Specify clearly if "Strictly Bald", "Buzz Cut (1-2mm stubble)", or "Short Hair". This is CRITICAL.
-    2. FACIAL HAIR: Distinguish between "Clean Shaven", "Short Stubble (2mm)", "Trimmed Beard", or "Full Beard".
-    3. COLOR: Solid dark colors (e.g. black/brown). Ignore gray/white strands. 
-    4. APPARENT AGE: Keep it youthful (approx. 30-35 years old).
-    No preamble, English, max 50 words.`;
+    1. SUBJECTS: Identify ALL subjects (People, Pets, etc.). For each person, describe Hair, Facial Hair, and Gender.
+    2. GENDER: Explicitly state "Male", "Female", or "Non-binary" based on visual traits. DO NOT DEFAULT TO MALE.
+    3. HAIR: Specify style clearly (e.g., "Bald", "Long Curly", "Short").
+    4. AGE: Estimate apparent age naturally (do not force youth).
+    5. PETS: If a pet is present (Dog, Cat, etc.), describe its breed and color.
+    No preamble, English, max 60 words.`;
 
     try {
-        console.log("👁️ [Vision] Analyzing Head & Facial hair precision...");
+        console.log("👁️ [Vision] Analyzing Scene & Subjects...");
         const result = await model.generateContent([
             { text: prompt },
             { inlineData: { data: base64Data, mimeType: mimeType } }
@@ -46,7 +47,7 @@ export const analyzeImageTraits = async (base64String, apiKey = null) => {
         return text;
     } catch (error) {
         console.warn('⚠️ [Vision] Fallback:', error.message);
-        return "Young adult, strictly bald head, short stubble, dark facial hair";
+        return "Adult subject, short hair, neutral expression";
     }
 };
 
@@ -72,10 +73,10 @@ export const generateImageWithGemini = async (traits, name = 'someone', style = 
         SUBJECTS TO RENDER: ${traits}.
         ${customPrompt ? `ADDITIONAL USER INSTRUCTIONS: ${customPrompt}.` : ''}
         CRITICAL STYLE RULES:
-        - HEAD HAIR: If traits mention "Bald" or "Buzz Cut", RENDER STICKLY AS SUCH. NO visible hair on top unless specified.
-        - FACIAL HAIR: Strictly follow the length. No full beards for stubble subjects. Ensure solid dark colors.
+        - FIDELITY: Respect the detected Gender, Age, and Subjects (including Pets) strictly.
+        - HEAD HAIR: Render exactly as described.
         SCENE DETAILS: hyper-detailed textures, 8k masterpiece, bokeh blurred background. 
-        COMPOSITION: Strictly feature only the subjects described. Ensure age is rendered naturally (30-35 years old).`;
+        COMPOSITION: Feature all subjects described (Group shot if multiple subjects).`;
 
         console.log(`🎨 [Imagen 3] Rendering ${style} scene for: ${name}...`);
         const model = genAI.getGenerativeModel({
