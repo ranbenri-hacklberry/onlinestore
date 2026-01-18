@@ -396,7 +396,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
 
             // First, let Gemini "SEE" the user and describe them
             console.log("👁️ [AI Avatar] Calling analyzeImageTraits...");
-            const traits = await analyzeImageTraits(photoToUse, googleApiKey || undefined);
+            const traits = await analyzeImageTraits(photoToUse, (googleApiKey || undefined) as any);
             console.log("📝 [AI Avatar] Extracted traits successfully");
 
             setIsAnalyzingPhoto(false);
@@ -404,7 +404,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
 
             // Second, generate the image based on those traits, style, and CUSTOM prompt
             console.log(`🎨 [AI Avatar] Calling generateImageWithGemini (Style: ${selectedStyle}, Prompt: ${avatarPrompt})...`);
-            const base64Avatar = await generateImageWithGemini(traits, customerName, selectedStyle, avatarPrompt, googleApiKey || undefined);
+            const base64Avatar = await generateImageWithGemini(traits, customerName, selectedStyle, avatarPrompt, (googleApiKey || undefined) as any);
 
             clearTimeout(safetyTimer);
             setUserAvatar(base64Avatar);
