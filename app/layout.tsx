@@ -1,3 +1,4 @@
+// Root Layout for Nursery Store
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import "./globals.css";
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     siteName: 'שפת המדבר',
     images: [
       {
-        url: '/og-image.png', // We copied logo.png here
+        url: '/og-image.png',
         width: 800,
         height: 800,
         alt: 'לוגו שפת המדבר',
@@ -61,7 +62,7 @@ export default function RootLayout({
       <head>
         <meta name="google" content="notranslate" />
       </head>
-      <body className={`${heebo.variable} font-heebo antialiased bg-white text-gray-900`}>
+      <body className={`${heebo.variable} font-chalk text-[22px] antialiased bg-white text-gray-900`}>
         {children}
       </body>
     </html>

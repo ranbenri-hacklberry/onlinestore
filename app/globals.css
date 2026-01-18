@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap');
 @import "tailwindcss";
 @import 'leaflet/dist/leaflet.css';
 
@@ -35,4 +36,14 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Global Chalk Font Utility */
+.font-chalk {
+  font-family: "Amatic SC", cursive;
+  font-weight: 700;
+  /* Removed fixed font-size so tailwind utilities (text-4xl etc) work again */
+  line-height: 1.1;
+  /* Adaptive faux-bold: strokes match the text color automatically */
+  text-shadow: 0.5px 0 0 currentColor, -0.5px 0 0 currentColor, 0 0.5px 0 currentColor, 0 -0.5px 0 currentColor;
 }

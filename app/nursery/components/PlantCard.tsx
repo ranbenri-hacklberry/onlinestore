@@ -35,134 +35,122 @@ const lightNeedsIcons = {
 };
 
 export default function PlantCard({ plant, index = 0, onClick }: PlantCardProps) {
-    const [isHovered, setIsHovered] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [imageError, setImageError] = useState(false);
 
     const defaultImage = 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?q=80&w=500&auto=format&fit=crop';
     const imageUrl = imageError ? defaultImage : (plant.image_url || defaultImage);
 
+    // Parse description for sizes if applicable
+    const parsedSizes = (() => {
+        try {
+            const data = JSON.parse(plant.description || '');
+            if (typeof data === 'object' && Object.keys(data).length > 0) return data;
+        } catch (e) { }
+        return null;
+    })();
+
     return (
         <motion.div
-            className="relative group cursor-pointer"
+            className="group cursor-pointer"
             onClick={() => onClick?.(plant)}
-            onHoverStart={() => setIsHovered(true)}
-            onHoverEnd={() => setIsHovered(false)}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -8 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: index * 0.05 }}
         >
-            <div className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-emerald-100 group-hover:border-emerald-300">
-                {/* Image Container */}
-                <div className="relative h-48 md:h-56 overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50">
-                    {/* Loading Skeleton */}
-                    {!imageLoaded && (
-                        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center">
-                            <span className="text-5xl opacity-30">🌿</span>
-                        </div>
-                    )}
+            <div className="bg-[#fcfbf7] rounded-[1rem] overflow-hidden hover:shadow-xl transition-all duration-300 border border-[#eaddcf] h-full flex flex-col relative">
 
-                    <motion.div
-                        className="relative w-full h-full"
-                        animate={{ scale: isHovered ? 1.1 : 1 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <Image
-                            src={imageUrl}
-                            alt={plant.name}
-                            fill
-                            sizes="(max-width: 768px) 50vw, 33vw"
-                            className={`object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                            onLoad={() => setImageLoaded(true)}
-                            onError={() => setImageError(true)}
-                            loading="lazy"
-                        />
-                    </motion.div>
-
-                    {/* Overlay on Hover */}
-                    <motion.div
-                        className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: isHovered ? 1 : 0 }}
-                    />
-
-                    {/* Out of Stock Badge */}
-                    {plant.in_stock === false && (
-                        <div className="absolute top-3 right-3 bg-gray-900/80 text-white px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm">
-                            אזל מהמלאי
-                        </div>
-                    )}
-
-                    {/* Care Level Badge */}
-                    {plant.care_level && (
-                        <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium ${careLevelLabels[plant.care_level].color}`}>
-                            {careLevelLabels[plant.care_level].text}
-                        </div>
-                    )}
-
-                    {/* Light Needs Icon */}
-                    {plant.light_needs && (
-                        <motion.div
-                            className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs flex items-center gap-1"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 10 }}
-                        >
-                            <span>{lightNeedsIcons[plant.light_needs].icon}</span>
-                            <span className="text-gray-600">{lightNeedsIcons[plant.light_needs].text}</span>
-                        </motion.div>
-                    )}
-                </div>
-
-                {/* Content */}
-                <div className="p-4">
-                    {/* Category Tag */}
-                    {plant.category && (
-                        <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-full">
-                            {plant.category}
-                        </span>
-                    )}
-
-                    {/* Name */}
-                    <h3 className="text-lg font-bold text-gray-800 mt-2 mb-1 line-clamp-1 group-hover:text-emerald-700 transition-colors">
-                        {plant.name}
-                    </h3>
-
-                    {/* Description or Sizes */}
-                    {(() => {
-                        try {
-                            const sizesData = JSON.parse(plant.description || '');
-                            if (typeof sizesData === 'object' && (sizesData['8L'] || sizesData['10L'] || sizesData['25L'])) {
-                                return (
-                                    <div className="flex flex-wrap gap-2 mb-3 mt-2">
-                                        {Object.entries(sizesData).map(([size, price]) => (
-                                            <div key={size} className="flex flex-col items-center bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 min-w-[50px]">
-                                                <span className="text-[10px] text-gray-400 font-medium uppercase">{size}</span>
-                                                <span className="text-xs font-bold text-emerald-700">₪{price as number}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                );
-                            }
-                        } catch (e) {
-                            // Focus on showing regular description
-                        }
-                        return plant.description && (
-                            <p className="text-sm text-gray-500 line-clamp-2 mb-3">
-                                {plant.description}
-                            </p>
-                        );
-                    })()}
-
-                    {/* Price Row (Main Price) */}
-                    <div className="flex items-center justify-between border-t border-gray-50 pt-3">
-                        <div className="flex items-baseline gap-1">
-                            <span className="text-xl font-black text-emerald-600">
-                                ₪{plant.price}
-                            </span>
-                            <span className="text-[10px] text-gray-400 font-medium">החל מ-</span>
+                {/* Out of Stock Overlay */}
+                {plant.in_stock === false && (
+                    <div className="absolute inset-0 z-20 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+                        <div className="bg-stone-900 text-white px-3 py-1 text-xs font-bold tracking-wider rounded-full shadow-sm">
+                            אזל במלאי
                         </div>
                     </div>
+                )}
+
+                {/* Image Container */}
+                <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
+                    {!imageLoaded && (
+                        <div className="absolute inset-0 animate-pulse bg-stone-200 flex items-center justify-center">
+                            <span className="opacity-20 text-3xl">🌿</span>
+                        </div>
+                    )}
+                    <Image
+                        src={imageUrl}
+                        alt={plant.name}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className={`object-cover transition-transform duration-700 group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                        onLoad={() => setImageLoaded(true)}
+                        onError={() => setImageError(true)}
+                        loading="lazy"
+                    />
+
+                </div>
+
+                <div className="p-3 flex flex-col flex-1 bg-[#1e3a2f] border-t-4 border-[#8B4513]/30 relative">
+                    <div className="mb-2">
+                        <h3
+                            className="text-3xl text-[#f0fdf4] leading-none tracking-wide drop-shadow-sm"
+                            style={{
+                                fontFamily: '"Amatic SC", cursive',
+                                fontWeight: 700,
+                                // Clean faux-bold: subtle 0.5px stroke, no messy shadows
+                                textShadow: '0.5px 0 0 currentColor, -0.5px 0 0 currentColor, 0 0.5px 0 currentColor, 0 -0.5px 0 currentColor'
+                            }}
+                        >
+                            {plant.name}
+                        </h3>
+                    </div>
+
+                    {/* Description / Sizes */}
+                    <div className="flex-1">
+                        {parsedSizes ? (
+                            <div className="grid grid-cols-3 gap-2 mt-auto">
+                                {Object.entries(parsedSizes).map(([size, price], i) => (
+                                    <div key={size} className="bg-white/5 border border-white/30 rounded-lg p-1.5 flex flex-col items-center justify-center gap-0.5 shadow-sm hover:bg-white/10 transition-colors text-center h-full">
+                                        <div className="flex flex-col items-center justify-between h-full w-full">
+                                            <span className="text-xl md:text-2xl text-stone-100 opacity-90 font-chalk tracking-wide leading-none pt-1" style={{
+                                                textShadow: '0.5px 0 0 currentColor, -0.5px 0 0 currentColor, 0 0.5px 0 currentColor, 0 -0.5px 0 currentColor'
+                                            }}>
+                                                {size}
+                                            </span>
+                                            <span className="text-3xl md:text-4xl font-bold text-white font-chalk leading-none pb-1" style={{
+                                                textShadow: '0.5px 0 0 currentColor, -0.5px 0 0 currentColor, 0 0.5px 0 currentColor, 0 -0.5px 0 currentColor'
+                                            }}>
+                                                {price as number}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            plant.description && (
+                                <p className="text-base text-white/90 line-clamp-2 leading-tight tracking-wide" style={{
+                                    fontFamily: '"Amatic SC", cursive',
+                                    fontWeight: 700,
+                                    textShadow: '0.5px 0 0 currentColor, -0.5px 0 0 currentColor, 0 0.5px 0 currentColor, 0 -0.5px 0 currentColor'
+                                }}>
+                                    {plant.description}
+                                </p>
+                            )
+                        )}
+                    </div>
+
+                    {/* Bottom Row */}
+                    {!parsedSizes && (
+                        <div className="mt-3 pt-2 border-t border-white/10 flex items-center justify-between">
+                            <span className="text-lg text-white/50" style={{ fontFamily: '"Amatic SC", cursive', fontWeight: 700 }}>מחיר ליח'</span>
+                            <span className="text-4xl text-white tracking-wide" style={{
+                                fontFamily: '"Amatic SC", cursive',
+                                fontWeight: 700,
+                                textShadow: '0.5px 0 0 currentColor, -0.5px 0 0 currentColor, 0 0.5px 0 currentColor, 0 -0.5px 0 currentColor'
+                            }}>
+                                {plant.price}
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
         </motion.div>

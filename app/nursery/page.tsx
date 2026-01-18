@@ -18,17 +18,19 @@ const BUSINESS_ID = '8e4e05da-2d99-4bd9-aedf-8e54cbde930a';
 interface Category {
     id: string;
     name: string;
-    name_he: string;
-    icon: string;
+    name_he?: string;
+    icon?: string;
+    position?: number;
 }
 
 interface Plant {
     id: string;
     name: string;
-    price: number;
-    image_url?: string;
     description?: string;
-    category: string;
+    image_url?: string;
+    price: number;
+    variations?: any;
+    category?: string;
     category_id: string;
     is_in_stock: boolean;
 }
@@ -39,6 +41,8 @@ export default function NurseryPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [activeCategory, setActiveCategory] = useState('');
+    // Filter logic state
+    const [subCategoryFilter, setSubCategoryFilter] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
     // Fetch data from Supabase
@@ -107,14 +111,36 @@ export default function NurseryPage() {
         // Filter by category
         if (activeCategory) {
             const activeCat = categories.find(c => c.id === activeCategory);
-            if (activeCat?.name_he === 'שיחים ועצים') {
-                // If main "Trees & Shrubs" is selected, show everything that is tree-related
-                const treeRelatedCatIds = categories
-                    .filter(c => ['שיחים ועצים', 'שיחים', 'עצי נוי', 'עצי פרי'].includes(c.name_he))
-                    .map(c => c.id);
-                items = items.filter(item => treeRelatedCatIds.includes(item.category_id));
+            // Check both name_he and name to correspond to 'Trees & Shrubs'
+            const isTreesAndShrubs = activeCat?.name_he === 'שיחים ועצים' || activeCat?.name === 'שיחים ועצים';
+
+            if (isTreesAndShrubs) {
+                // If main "Trees & Shrubs" is selected
+                if (subCategoryFilter) {
+                    // special handling for "Shrubs" (שיחים) to include the general "Trees & Shrubs" items
+                    // since there are 0 specific shrubs but 7 general ones in the DB.
+                    const subCatName = categories.find(c => c.id === subCategoryFilter)?.name_he?.trim();
+
+                    if (subCatName === 'שיחים') {
+                        items = items.filter(item =>
+                            item.category_id === subCategoryFilter ||
+                            item.category_id === activeCategory // Include general category items
+                        );
+                    } else {
+                        items = items.filter(item => item.category_id === subCategoryFilter);
+                    }
+                } else {
+                    // Show everything related to trees/shrubs (checking both name fields)
+                    const treeRelatedCatIds = categories
+                        .filter(c => {
+                            const n = c.name_he || c.name;
+                            return ['שיחים ועצים', 'שיחים', 'עצי נוי', 'עצי פרי'].includes(n);
+                        })
+                        .map(c => c.id);
+                    items = items.filter(item => treeRelatedCatIds.includes(item.category_id));
+                }
             } else {
-                // Specific category (e.g., just "Fruit Trees")
+                // Specific category (e.g., just "Fruit Trees" selected directly or other categories)
                 items = items.filter(item => item.category_id === activeCategory);
             }
         }
@@ -130,7 +156,7 @@ export default function NurseryPage() {
         }
 
         return items;
-    }, [activeCategory, plants, categories, searchQuery]);
+    }, [activeCategory, subCategoryFilter, plants, categories, searchQuery]);
 
     // Handle plant click - just log for now (catalog mode)
     const handlePlantClick = (plant: Plant) => {
@@ -152,58 +178,103 @@ export default function NurseryPage() {
 
                 {/* Description Section */}
                 <div className="max-w-4xl mx-auto px-4 md:px-8 pt-8 pb-4 text-center">
-                    <h2 className="text-2xl md:text-3xl font-bold text-[#7a8c6e] mb-4">
-                        גן עדן לאוהבי צמחים וקפה טוב
+                    <h2 className="text-5xl md:text-6xl font-chalk text-[#7a8c6e] mb-4 tracking-wide leading-tight">
+                        בואו להתאהב בטבע
                     </h2>
-                    <p className="text-gray-600 text-lg md:text-xl leading-relaxed">
-                        משתלה ועגלת קפה בלב גיתית.
+                    <p className="text-gray-600 text-xl md:text-2xl leading-relaxed font-rubik font-light">
+                        במשתלת 'שפת המדבר' אנחנו מגדלים באהבה צמחים שמכניסים חיים ושמחה לכל פינה.
+                        שילוב של פריחה משכרת, ירוק בעיניים ואווירה מדברית קסומה.
                         <br className="hidden md:block" />
-                        שפע פרחים, תבלינים, שיחים ועצים.
-                        <br className="hidden md:block" />
-                        קפה ומאפים • אי של שלווה בנוף קסום ומדברי.
+                        מוזמנים לקפוץ לקפה, לשאוף אוויר נקי ולקחת איתכם קצת מהטבע הביתה.
                     </p>
                 </div>
 
+                {/* Hebrew Work Badge */}
+                <div className="text-center mt-6 mb-8">
+                    <span
+                        className="inline-block text-[#7a8c6e] text-xl md:text-2xl tracking-widest px-6 py-2 border-2 border-[#7a8c6e] rounded-sm relative font-chalk font-bold shadow-sm"
+                        style={{
+                            boxShadow: 'inset 0 0 0 3px white, inset 0 0 0 4px #7a8c6e'
+                        }}
+                    >
+                        עֲבוֹדָה עִבְרִית
+                    </span>
+                </div>
+
+                {/* Separator Line */}
+                <div className="max-w-xs mx-auto mb-10 border-t border-[#7a8c6e]/30"></div>
+
                 {/* Categories */}
                 <div className="max-w-7xl mx-auto px-4 md:px-8">
-                    {/* Hebrew Work Badge - 50s Vintage Style */}
-                    <div className="text-center mb-6">
-                        <span
-                            className="inline-block text-[#7a8c6e] text-xl md:text-2xl font-serif tracking-widest px-6 py-2 border-2 border-[#7a8c6e] rounded-sm relative"
-                            style={{
-                                fontFamily: 'Georgia, "Times New Roman", serif',
-                                boxShadow: 'inset 0 0 0 3px white, inset 0 0 0 4px #7a8c6e'
-                            }}
-                        >
-                            עֲבוֹדָה עִבְרִית
-                        </span>
-                    </div>
-
                     <NurseryCategoryFilter
                         categories={filterCategories}
                         activeCategory={activeCategory}
-                        onCategoryChange={setActiveCategory}
+                        onCategoryChange={(id) => {
+                            setActiveCategory(id);
+                            setSubCategoryFilter(null); // Reset sub-filter on main category change
+                        }}
                     />
 
-                    {/* Products Count */}
-                    <div className="flex items-center justify-between mb-6 mt-8">
-                        <h2 className="text-2xl font-black text-gray-800">
+                    {/* Category Title & Inline Sub-Filters */}
+                    {/* Category Title & Inline Sub-Filters */}
+                    <div className="flex flex-wrap items-center mb-6 mt-8 gap-4 border-b border-stone-100 pb-2">
+                        <h2 className="text-4xl font-chalk text-gray-800 tracking-wide">
                             {filterCategories.find(c => c.id === activeCategory)?.name || 'צמחים'}
                         </h2>
-                        <span className="text-gray-500 text-sm font-medium bg-gray-100 px-3 py-1 rounded-full">
-                            {filteredItems.length} פריטים
-                        </span>
+
+                        {/* Dynamic Sub-Filters for Trees & Shrubs */}
+                        {filterCategories.find(c => c.id === activeCategory)?.name === 'שיחים ועצים' && (
+                            <div className="flex flex-wrap items-center gap-2 py-1 px-1">
+                                {/* "All" Chip */}
+                                <button
+                                    onClick={() => setSubCategoryFilter(null)}
+                                    className={`px-3 py-1 rounded-full text-lg transition-all whitespace-nowrap font-chalk ${!subCategoryFilter
+                                        ? 'bg-[#7a8c6e] text-white shadow-md'
+                                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                                        }`}
+                                >
+                                    הכל
+                                </button>
+
+                                {/* Specific Categories Chips */}
+                                {['עצי פרי', 'עצי נוי', 'שיחים'].map(subName => {
+                                    // Robust lookup: check both name and name_he with trim
+                                    const subCat = categories.find(c => {
+                                        const he = c.name_he?.trim();
+                                        const en = c.name?.trim();
+                                        return he === subName || en === subName;
+                                    });
+
+                                    if (!subCat) return null;
+
+                                    return (
+                                        <button
+                                            key={subCat.id}
+                                            onClick={() => setSubCategoryFilter(subCat.id)}
+                                            className={`px-3 py-1 rounded-full text-lg transition-all whitespace-nowrap font-chalk ${subCategoryFilter === subCat.id
+                                                ? 'bg-[#7a8c6e] text-white shadow-md'
+                                                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                                                }`}
+                                        >
+                                            {subName}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {/* Item count removed as per request */}
                     </div>
 
                     {/* Loading State */}
                     {loading ? (
                         <div className="flex items-center justify-center py-20">
-                            <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-12 h-12 border-4 border-[#7a8c6e] border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     ) : filteredItems.length === 0 ? (
                         <div className="text-center py-20">
-                            <div className="text-6xl mb-4">🌵</div>
-                            <p className="text-gray-500 text-lg">לא נמצאו צמחים בקטגוריה זו</p>
+                            <div className="text-6xl mb-4 opacity-50">🌵</div>
+                            <p className="text-gray-500 text-xl font-chalk">לא נמצאו צמחים כרגע...</p>
                         </div>
                     ) : (
                         /* Products Grid */

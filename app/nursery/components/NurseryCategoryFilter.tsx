@@ -64,7 +64,7 @@ export default function NurseryCategoryFilter({
                             key={category.id}
                             onClick={() => onCategoryChange(category.id)}
                             className={`
-                                relative flex flex-col items-center justify-center px-3 py-2 rounded-lg font-medium transition-all duration-300 min-w-[60px]
+                                relative flex items-center justify-center px-4 py-2 rounded-lg font-chalk transition-all duration-300 min-w-[80px]
                                 ${isActive
                                     ? 'bg-[#7a8c6e] text-white shadow-md'
                                     : 'bg-[#7a8c6e]/10 text-[#7a8c6e] hover:bg-[#7a8c6e]/20 border border-[#7a8c6e]/20'
@@ -75,58 +75,20 @@ export default function NurseryCategoryFilter({
                             transition={{ delay: index * 0.05 }}
                             whileTap={{ scale: 0.95 }}
                         >
-                            <span className="text-lg mb-0.5">
-                                {icon}
-                            </span>
                             {hasMultipleWords ? (
-                                <div className="flex flex-col items-center text-[10px] leading-tight">
+                                <div className="flex flex-col items-center text-xl leading-none">
                                     {nameParts.map((part, i) => (
                                         <span key={i}>{part}</span>
                                     ))}
                                 </div>
                             ) : (
-                                <span className="text-[10px]">{category.name}</span>
+                                <span className="text-xl">{category.name}</span>
                             )}
                         </motion.button>
                     );
                 })}
             </div>
 
-            {/* Sub Categories for Trees & Shrubs */}
-            <AnimatePresence>
-                {isTreeRelatedActive && subCategories.length > 0 && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="flex flex-col items-center gap-2 overflow-hidden w-full"
-                    >
-                        <div className="h-px bg-emerald-100 w-32 mb-1" />
-                        <div className="flex justify-center gap-2 px-4 py-1 overflow-x-auto no-scrollbar w-full">
-                            {subCategories.reverse().map((sub, i) => {
-                                const isActive = sub.id === activeCategory;
-                                return (
-                                    <motion.button
-                                        key={sub.id}
-                                        onClick={() => onCategoryChange(sub.id)}
-                                        className={`
-                                            px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-all
-                                            ${isActive
-                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                                : 'bg-white text-gray-400 border-gray-100 hover:border-emerald-100 hover:text-emerald-500'
-                                            }
-                                        `}
-                                        whileTap={{ scale: 0.95 }}
-                                    >
-                                        <span className="ml-1">{categoryIcons[sub.name]}</span>
-                                        {sub.name}
-                                    </motion.button>
-                                );
-                            })}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

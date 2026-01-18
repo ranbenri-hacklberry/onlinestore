@@ -56,6 +56,8 @@ export default {
       },
       fontFamily: {
         sans: ['var(--font-heebo)', 'Heebo', 'sans-serif'],
+        heebo: ['var(--font-heebo)', 'sans-serif'],
+        chalk: ['"Amatic SC"', 'cursive', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       fontSize: {
