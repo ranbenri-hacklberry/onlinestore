@@ -22,6 +22,7 @@ const categoryIcons: Record<string, string> = {
     'שיחים': '🌿',
     'עצי נוי': '🌳',
     'עצי פרי': '🍋',
+    'כלי עבודה': '✂️',
     'default': '✾'
 };
 
@@ -49,13 +50,20 @@ export default function NurseryCategoryFilter({
     return (
         <div className="flex flex-col items-center gap-4 w-full">
             {/* Main Categories */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:flex lg:justify-center lg:flex-wrap gap-2 w-full px-2">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:flex lg:justify-center lg:flex-wrap gap-1.5 w-full px-1">
                 {displayCategories.map((category, index) => {
                     const isActive = category.id === activeCategory ||
                         (category.name === 'שיחים ועצים' && isTreeRelatedActive);
 
-                    // Split name into lines if more than one word to make it narrower
-                    const nameParts = category.name.split(' ');
+                    // Specific logic for layout span if we want the last item to be full width in odd cases
+                    // But usually 3 cols is fine.
+                    const isLast = index === displayCategories.length - 1;
+                    const isOddTotal = displayCategories.length % 3 !== 0;
+                    // Let's keep it simple grid for now, 3 cols fits nicely on mobile
+
+                    // Split name into lines
+                    const safeName = category.name || '';
+                    const nameParts = safeName.split(' ');
                     const hasMultipleWords = nameParts.length > 1;
 
                     return (
@@ -63,7 +71,7 @@ export default function NurseryCategoryFilter({
                             key={category.id}
                             onClick={() => onCategoryChange(category.id)}
                             className={`
-                                relative flex items-center justify-center px-1 py-2 rounded-lg font-chalk transition-all duration-300 w-full h-full min-h-[60px]
+                                relative flex items-center justify-center px-1 py-1 rounded-lg font-chalk transition-all duration-300 w-full h-full min-h-[55px]
                                 ${isActive
                                     ? 'bg-[#7a8c6e] text-white shadow-md'
                                     : 'bg-[#7a8c6e]/10 text-[#7a8c6e] hover:bg-[#7a8c6e]/20 border border-[#7a8c6e]/20'
@@ -75,13 +83,13 @@ export default function NurseryCategoryFilter({
                             whileTap={{ scale: 0.95 }}
                         >
                             {hasMultipleWords ? (
-                                <div className="flex flex-col items-center justify-center text-2xl md:text-3xl leading-[0.85] w-full text-center">
+                                <div className="flex flex-col items-center justify-center text-xl md:text-2xl leading-[0.85] w-full text-center">
                                     {nameParts.map((part, i) => (
                                         <span key={i}>{part}</span>
                                     ))}
                                 </div>
                             ) : (
-                                <span className="text-2xl md:text-3xl px-1">{category.name}</span>
+                                <span className="text-xl md:text-2xl px-1">{category.name}</span>
                             )}
                         </motion.button>
                     );

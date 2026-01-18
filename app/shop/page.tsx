@@ -18,9 +18,7 @@ import dynamic from 'next/dynamic';
 const OrderTracker = dynamic(() => import('./components/OrderTracker'), { ssr: false });
 
 // Hooks & Libs
-// Hooks & Libs
 import { supabase } from '@/lib/supabase';
-import { db } from '@/db/database';
 
 const BUSINESS_ID = '22222222-2222-2222-2222-222222222222';
 
