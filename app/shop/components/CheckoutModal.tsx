@@ -430,7 +430,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
         setAnalysisText('מוליד תנועה...');
 
         try {
-            const videoUrl = await generateVideoWithVeo(userAvatar, `Cinematic motion for this ${selectedStyle} character, high quality, 4k`, googleApiKey);
+            const videoUrl = await generateVideoWithVeo(userAvatar, `Cinematic motion for this ${selectedStyle} character, high quality, 4k`, (googleApiKey || undefined) as any);
 
             // If API returns null (simulation mode), we use the image as a "live" placeholder
             // or we can simulate a successful generation for testing
