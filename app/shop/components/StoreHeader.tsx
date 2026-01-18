@@ -2,16 +2,28 @@
 
 import { ShoppingBag, User, Clock, CheckCircle2, Bike, ChefHat, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 interface StoreHeaderProps {
     cartCount: number;
     onCartClick: () => void;
     activeOrder?: any;
     onTrackClick?: () => void;
+    onHomeClick?: () => void;
     hideCart?: boolean;
 }
 
-export default function StoreHeader({ cartCount, onCartClick, activeOrder, onTrackClick, hideCart = false }: StoreHeaderProps) {
+export default function StoreHeader({ cartCount, onCartClick, activeOrder, onTrackClick, onHomeClick, hideCart = false }: StoreHeaderProps) {
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 400);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const getStatusInfo = (s: string) => {
         if (s === 'delivered') return { label: 'נמסרה', icon: CheckCircle2, color: 'text-green-600 bg-green-50 border-green-200 shadow-green-100' };
@@ -24,17 +36,31 @@ export default function StoreHeader({ cartCount, onCartClick, activeOrder, onTra
 
     return (
         <motion.header
-            initial={{ y: -100 }}
-            animate={{ y: 0 }}
-            className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 px-4 md:px-8 py-3 flex items-center justify-between shadow-sm h-[72px]"
+            initial={{ y: -100, opacity: 0 }}
+            animate={{
+                y: isScrolled || activeOrder ? 0 : -100,
+                opacity: isScrolled || activeOrder ? 1 : 0
+            }}
+            transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+            className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 md:px-8 py-3 flex items-center justify-between shadow-sm h-[72px]"
         >
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.reload()}>
-                <div className="relative w-32 h-14 overflow-hidden">
-                    <img
-                        src="/brand/icaffe-icon-final.png"
-                        alt="iCaffe"
-                        className="object-contain w-full h-full scale-150"
-                    />
+            <div className="flex items-center gap-4 cursor-pointer" onClick={onHomeClick}>
+                <div className="relative w-24 h-12 overflow-hidden flex items-center justify-center">
+                    <div className="relative w-40 h-40 -mt-14"> {/* Cropping container */}
+                        <Image
+                            src="/brand/icaffe-icon-final.png"
+                            alt="iCaffe"
+                            fill
+                            className="object-contain"
+                            priority
+                            sizes="160px"
+                        />
+                    </div>
+                </div>
+
+                <div className="flex flex-col border-r border-gray-100 pr-4 mr-1">
+                    <span className="text-[10px] font-black leading-tight text-gray-500">בית קפה</span>
+                    <span className="text-[10px] font-black leading-tight text-gray-400">ודברים טובים</span>
                 </div>
             </div>
 

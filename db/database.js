@@ -245,6 +245,7 @@ db.version(12).stores({
     delivery_settings: 'id, business_id'
 });
 
+
 // Export table references for easy access
 export const {
     active_order_items,

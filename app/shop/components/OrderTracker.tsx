@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Customer } from '../types';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Phone, Navigation, CheckCircle2, Clock, ChefHat, Bike } from 'lucide-react';
+import { Phone, Navigation, CheckCircle2, Clock, ChefHat, Bike, ArrowLeft, ArrowRight, User } from 'lucide-react';
 import L from 'leaflet';
 
 // Fix Leaflet Icon
@@ -20,6 +20,7 @@ const icon = L.icon({
 interface OrderTrackerProps {
     order: any;
     customer: Customer | null;
+    onAvatarClick?: () => void;
 }
 
 const STEPS = [
@@ -32,7 +33,7 @@ const STEPS = [
 import { supabase } from '@/lib/supabase';
 import { Upload, XCircle, CheckCircle } from 'lucide-react';
 
-export default function OrderTracker({ order, customer }: OrderTrackerProps) {
+export default function OrderTracker({ order, customer, onAvatarClick }: OrderTrackerProps) {
     // Real-time Order Sync
     const [localOrder, setLocalOrder] = React.useState(order);
     const [isUploading, setIsUploading] = React.useState(false);
@@ -131,9 +132,25 @@ export default function OrderTracker({ order, customer }: OrderTrackerProps) {
     const bikePos = [32.0863, 34.7828]; // Slightly offset
 
     return (
-        <div className="min-h-screen bg-stone-50 pb-20">
+        <div className="min-h-full bg-stone-50 pb-12">
             {/* Header */}
-            <div className={`p-6 shadow-sm border-b transition-colors ${needsPaymentProof && !uploadedUrl ? 'bg-orange-50 border-orange-100' : 'bg-white border-stone-100'}`}>
+            <div className={`p-6 shadow-sm border-b transition-colors relative ${needsPaymentProof && !uploadedUrl ? 'bg-orange-50 border-orange-100' : 'bg-white border-stone-100'}`}>
+                {/* Avatar Invite Floating Button - Top Right */}
+                <motion.button
+                    onClick={onAvatarClick}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="absolute top-6 left-6 w-14 h-14 bg-white rounded-[1.25rem] shadow-xl border border-orange-100 flex flex-col items-center justify-center gap-1 group overflow-hidden z-20"
+                >
+                    <div className="relative">
+                        <User size={24} className="text-gray-300 group-hover:text-orange-500 transition-colors" />
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border-2 border-white animate-pulse" />
+                    </div>
+                    <span className="text-[8px] font-black text-orange-500 uppercase tracking-tighter">AI AVATAR</span>
+                </motion.button>
+
                 <div className="max-w-md mx-auto text-center">
                     {!needsPaymentProof || (uploadedUrl && !isPendingVerification) ? (
                         <>
