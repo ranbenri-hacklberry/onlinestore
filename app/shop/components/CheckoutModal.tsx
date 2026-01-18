@@ -121,15 +121,20 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
     const [showAvatarPopup, setShowAvatarPopup] = useState(false);
     const [googleApiKey, setGoogleApiKey] = useState<string | null>(null);
 
-    // Fetch Business API Key
+    // Load API Key from local Dexie DB (synced from Supabase)
     useEffect(() => {
         if (businessId) {
-            db.businesses.get(businessId).then(business => {
+            // Use table() method to avoid TypeScript error if 'businesses' isn't explicitly typed on db instance
+            db.table('businesses').get(businessId).then(business => {
                 if (business && business.google_api_key) {
                     console.log("🔑 [Checkout] Using Business API Key");
                     setGoogleApiKey(business.google_api_key);
+                } else {
+                    console.warn("⚠️ [Checkout] No specific API key found for this business in local DB");
                 }
-            }).catch(err => console.warn("⚠️ Failed to fetch business settings", err));
+            }).catch(err => {
+                console.error("❌ [Checkout] Error fetching business config:", err);
+            });
         }
     }, [businessId]);
 
