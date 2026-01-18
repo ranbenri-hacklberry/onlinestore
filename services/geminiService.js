@@ -75,7 +75,7 @@ export const generateImageWithGemini = async (traits, name = 'someone', style = 
         CRITICAL STYLE RULES:
         - FIDELITY: Respect the detected Gender, Age, and Subjects (including Pets) strictly.
         - HEAD HAIR: Render exactly as described.
-        SCENE DETAILS: hyper-detailed textures, 8k masterpiece, bokeh blurred background. 
+        SCENE DETAILS: hyper-detailed textures, 1024x1024 resolution, 8k masterpiece, bokeh blurred background. 
         COMPOSITION: Feature all subjects described (Group shot if multiple subjects).`;
 
         console.log(`🎨 [Imagen 3] Rendering ${style} scene for: ${name}...`);

@@ -119,7 +119,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [showAvatarPopup, setShowAvatarPopup] = useState(false);
-    const [googleApiKey, setGoogleApiKey] = useState<string | null>(null);
+    const [googleApiKey, setGoogleApiKey] = useState<string | null>(process.env.NEXT_PUBLIC_GOOGLE_API_KEY || null);
 
     // Load API Key from local Dexie DB (synced from Supabase)
     useEffect(() => {
@@ -1412,13 +1412,37 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                                     מוכן! ✨
                                 </div>
                                 <button
-                                    onClick={() => {
-                                        const link = document.createElement('a');
-                                        link.href = userVideo || userAvatar!;
-                                        link.download = `Avatar-${selectedStyle}.${userVideo ? 'mp4' : 'png'}`;
-                                        link.click();
+                                    onClick={async () => {
+                                        try {
+                                            const fileUrl = userVideo || userAvatar;
+                                            if (!fileUrl) return;
+
+                                            if (navigator.share) {
+                                                const response = await fetch(fileUrl);
+                                                const blob = await response.blob();
+                                                const extension = userVideo ? 'mp4' : 'jpg';
+                                                const type = userVideo ? 'video/mp4' : 'image/jpeg';
+                                                const file = new File([blob], `avatar-${Date.now()}.${extension}`, { type });
+
+                                                await navigator.share({
+                                                    files: [file],
+                                                    title: 'האווטאר שלי',
+                                                    text: 'תראו מה יצרתי במעבדת הסטייל של שפת המדבר! 🌵✨'
+                                                });
+                                            } else {
+                                                const link = document.createElement('a');
+                                                link.href = fileUrl;
+                                                link.download = `Avatar-${selectedStyle}.${userVideo ? 'mp4' : 'png'}`;
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+                                            }
+                                        } catch (err) {
+                                            console.error("Save error:", err);
+                                            if (userAvatar || userVideo) window.open(userVideo || userAvatar!, '_blank');
+                                        }
                                     }}
-                                    className="absolute bottom-6 right-6 bg-white/90 backdrop-blur-md p-5 rounded-[2rem] text-blue-600 shadow-2xl active:scale-90 transition-all"
+                                    className="absolute bottom-6 right-6 bg-white/90 backdrop-blur-md p-5 rounded-[2rem] text-blue-600 shadow-2xl active:scale-90 transition-all flex items-center justify-center"
                                 >
                                     <Download size={28} />
                                 </button>
