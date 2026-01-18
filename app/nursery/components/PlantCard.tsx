@@ -89,7 +89,7 @@ export default function PlantCard({ plant, index = 0, onClick }: PlantCardProps)
 
                 </div>
 
-                <div className="p-3 flex flex-col flex-1 bg-[#1e3a2f] border-t-4 border-[#8B4513]/30 relative">
+                <div className="p-3 flex flex-col flex-1 bg-[#687f59] border-t-4 border-[#a3b18a]/30 relative">
                     <div className="mb-2">
                         <h3
                             className="text-3xl text-[#f0fdf4] leading-none tracking-wide drop-shadow-sm"
