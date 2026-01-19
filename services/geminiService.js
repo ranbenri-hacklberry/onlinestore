@@ -27,33 +27,44 @@ export const analyzeImageTraits = async (base64String, apiKey = null) => {
     const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
     const base64Data = mimeMatch ? mimeMatch[2] : (base64String.includes('base64,') ? base64String.split('base64,')[1] : base64String);
 
-    const prompt = `Task: High-fidelity visual analysis of all subjects in the image.
-    PRECISION REQUIREMENTS:
-    1. SUBJECTS: Identify ALL subjects (People, Pets, etc.). 
-    2. HUMANS: If a person is present, describe Gender, Hair, and Age. If NO person is present, explicitly state "NO human subjects".
-    3. PETS: If a pet is present, describe breed, color, and pose (lying, sitting, etc.).
-    4. GENDER: DO NOT DEFAULT TO MALE. Detect accurately.
-    No preamble, English, max 60 words.`;
+    const prompt = `Task: Analyze the image and return a JSON object.
+    Analyze the main subject(s):
+    1. Estimate Age (number).
+    2. Identify Gender (Male/Female/Non-binary/None if pet only).
+    3. Describe visual traits (Hair, Facial Hair, Glasses, Pets).
+    
+    Return ONLY valid JSON in this format:
+    {
+      "age": 30,
+      "gender": "Male",
+      "traits": "Short brown hair, glasses, beard...",
+      "has_pets": true/false
+    }`;
 
     try {
-        console.log("👁️ [Vision] Analyzing subjects accurately...");
+        console.log("👁️ [Vision] Analyzing subject for JSON data...");
         const result = await model.generateContent([
             { text: prompt },
             { inlineData: { data: base64Data, mimeType: mimeType } }
         ]);
-        const text = result.response.text().trim();
-        console.log("📝 [Vision] Precise Traits:", text);
-        return text;
+        let text = result.response.text().trim();
+        // Cleanup markdown if present
+        if (text.startsWith('```json')) text = text.replace(/^```json/, '').replace(/```$/, '');
+        else if (text.startsWith('```')) text = text.replace(/^```/, '').replace(/```$/, '');
+
+        console.log("📝 [Vision] Raw JSON:", text);
+        return JSON.parse(text);
     } catch (error) {
         console.warn('⚠️ [Vision] Fallback:', error.message);
-        return "Subject from the photo, accurate representation";
+        // Fallback object to prevent crash
+        return { age: 25, gender: "Neutral", traits: "Subject from photo", has_pets: false };
     }
 };
 
 /**
  * Step 2: Generate Artistic image (Imagen 3)
  */
-export const generateImageWithGemini = async (traits, name = 'someone', style = 'pixar', customPrompt = '', apiKey = null) => {
+export const generateImageWithGemini = async (traits, name = 'someone', style = 'pixar', customPrompt = '', apiKey = null, manualAge = null) => {
     const genAI = getGenAI(apiKey);
     if (!genAI) throw new Error('Gemini API Key missing');
 
@@ -72,9 +83,10 @@ export const generateImageWithGemini = async (traits, name = 'someone', style = 
         SUBJECTS TO RENDER: ${traits}.
         ${customPrompt ? `ADDITIONAL USER INSTRUCTIONS: ${customPrompt}.` : ''}
         CRITICAL RULES:
+        - AGE: Render subject as exactly ${manualAge || 'detected'} years old.
         - STRICT COMPOSITION: Render ONLY the subjects mentioned in TRAITS. 
-        - NO HUMANS: If traits state "NO human subjects", DO NOT include any humans in the image. This is mandatory.
-        - FIDELITY: Respect Gender, Age, and Pose (lying down, etc.) exactly as described.
+        - NO HUMANS: If traits state "NO human subjects", DO NOT include any humans in the image.
+        - FIDELITY: Respect Gender and Pose exactly as described.
         SCENE DETAILS: 1024x1024 resolution, 8k masterpiece, bokeh blurred background.`;
 
         console.log(`🎨 [Imagen 3] Rendering ${style} scene for: ${name}...`);
@@ -228,4 +240,29 @@ export const generateVideoWithVeo = async (base64Image, motionPrompt = "gentle m
     }
 };
 
-export default { analyzeImageTraits, generateImageWithGemini, processInvoiceWithGemini, generateVideoWithVeo };
+/**
+ * Maya AI: Deep Thinking Analysis
+ * Uses gemini-2.0-flash-thinking-exp-1219 for advanced business insights
+ */
+export const chatWithMaya = async (messages, apiKey = null) => {
+    const genAI = getGenAI(apiKey);
+    if (!genAI) throw new Error('Gemini API Key missing');
+
+    // Use the deep thinking experimental model
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-thinking-exp-1219" });
+
+    try {
+        console.log("🧠 [Maya Think] Processing deep business analysis...");
+        const result = await model.generateContent({
+            contents: messages
+        });
+        const text = result.response.text();
+        console.log("📝 [Maya Think] Analysis complete.");
+        return text;
+    } catch (error) {
+        console.error('❌ [Maya Think] Error:', error);
+        throw error;
+    }
+};
+
+export default { analyzeImageTraits, generateImageWithGemini, processInvoiceWithGemini, generateVideoWithVeo, chatWithMaya };

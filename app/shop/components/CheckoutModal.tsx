@@ -116,6 +116,12 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
     const [isImageLoading, setIsImageLoading] = useState(false);
     const [imageLoadError, setImageLoadError] = useState(false);
     const [avatarDiscount, setAvatarDiscount] = useState(0);
+    // Age Confirmation State
+    const [showAgeConfirmation, setShowAgeConfirmation] = useState(false);
+    const [detectedAge, setDetectedAge] = useState<number>(30);
+    const [confirmedAge, setConfirmedAge] = useState<number>(30);
+    const [detectedTraits, setDetectedTraits] = useState<string>('');
+
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [showAvatarPopup, setShowAvatarPopup] = useState(false);
@@ -395,31 +401,77 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
             setTimeout(() => setAnalysisText('מבצע תיקון תאורה...'), 2800);
 
             // First, let Gemini "SEE" the user and describe them
-            console.log("👁️ [AI Avatar] Calling analyzeImageTraits...");
-            const traits = await analyzeImageTraits(photoToUse, (googleApiKey || undefined) as any);
-            console.log("📝 [AI Avatar] Extracted traits successfully");
+            console.log("👁️ [AI Avatar] Calling analyzeImageTraits (JSON mode)...");
+            const analysisResult = await analyzeImageTraits(photoToUse, (googleApiKey || undefined) as any);
+            console.log("📝 [AI Avatar] Extracted analysis:", analysisResult);
 
+            // Handle both legacy string and new JSON responses
+            let traitsStr = '';
+            let age = 30;
+
+            if (typeof analysisResult === 'string') {
+                traitsStr = analysisResult;
+            } else {
+                traitsStr = analysisResult.traits;
+                age = analysisResult.age || 30;
+            }
+
+            setDetectedTraits(traitsStr);
+            setDetectedAge(age);
+            setConfirmedAge(age);
+
+            // STOP HERE -> Show Age Confirmation Modal
             setIsAnalyzingPhoto(false);
-            setIsGeneratingAvatar(true);
-
-            // Second, generate the image based on those traits, style, and CUSTOM prompt
-            console.log(`🎨 [AI Avatar] Calling generateImageWithGemini (Style: ${selectedStyle}, Prompt: ${avatarPrompt})...`);
-            const base64Avatar = await generateImageWithGemini(traits, customerName, selectedStyle, avatarPrompt, (googleApiKey || undefined) as any);
-
+            setShowAgeConfirmation(true);
+            setAnalysisText('');
             clearTimeout(safetyTimer);
+
+        } catch (err: any) {
+            console.error("❌ [AI Avatar] Analysis failed:", err);
+            clearTimeout(safetyTimer);
+            setImageLoadError(true);
+            setIsAnalyzingPhoto(false);
+        }
+    };
+
+    const confirmAgeAndGenerate = async () => {
+        setShowAgeConfirmation(false);
+        setIsGeneratingAvatar(true);
+        setAnalysisText('הגדרות אושרו.. מעצב דמות...');
+
+        // Safety timer just for this phase
+        const genTimer = setTimeout(() => {
+            setIsGeneratingAvatar(false);
+            setImageLoadError(true);
+        }, 40000);
+
+        try {
+            // Second, generate the image based on confirmed age
+            console.log(`🎨 [AI Avatar] Calling generateImageWithGemini (Age: ${confirmedAge})...`);
+
+            const base64Avatar = await generateImageWithGemini(
+                detectedTraits,
+                customerName,
+                selectedStyle,
+                avatarPrompt,
+                (googleApiKey || undefined) as any,
+                confirmedAge // FORCE MANUAL AGE
+            );
+
+            clearTimeout(genTimer);
             setUserAvatar(base64Avatar);
             setIsGeneratingAvatar(false);
             setAvatarStage('result');
-            setIsImageLoading(userAvatar !== base64Avatar); // Only set loading if it's a new image
+            setIsImageLoading(userAvatar !== base64Avatar);
             setImageLoadError(false);
             setAvatarDiscount(Math.floor(cartTotal * 0.05));
-            console.log("✅ [AI Avatar] Avatar generation sequence complete!");
-        } catch (err: any) {
-            console.error("❌ [AI Avatar] Analysis/Generation failed:", err);
-            clearTimeout(safetyTimer);
+            console.log("✅ [AI Avatar] generation sequence complete!");
+
+        } catch (err) {
+            console.error("❌ [AI Avatar] Generation failed:", err);
+            clearTimeout(genTimer);
             setImageLoadError(true);
             setIsGeneratingAvatar(false);
-            setIsAnalyzingPhoto(false);
         }
     };
 
@@ -1287,6 +1339,53 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
 
                         <AnimatePresence>
                             {isAnalyzingPhoto && <ScanningOverlay key="scan" />}
+
+                            {/* Age Confirmation Overlay */}
+                            {showAgeConfirmation && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    className="absolute inset-0 z-30 bg-white/95 backdrop-blur-md p-6 flex flex-col items-center justify-center text-center space-y-6"
+                                >
+                                    <div className="space-y-2">
+                                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2 text-4xl">
+                                            🎂
+                                        </div>
+                                        <h3 className="text-2xl font-black text-gray-900">AI: "אתה נראה בן {detectedAge}?"</h3>
+                                        <p className="text-sm text-gray-500 font-bold px-4 leading-tight">
+                                            הבינה המלאכותית שלנו קצת מתקשה עם תאורה. עזור לה לדייק כדי שהאווטאר יצא מושלם.
+                                        </p>
+                                    </div>
+
+                                    <div className="w-full space-y-4 px-4">
+                                        <div className="flex justify-between text-xs font-bold text-gray-400">
+                                            <span>צעיר יותר</span>
+                                            <span>מבוגר יותר</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="90"
+                                            value={confirmedAge}
+                                            onChange={(e) => setConfirmedAge(parseInt(e.target.value))}
+                                            className="w-full h-4 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500"
+                                        />
+                                        <div className="text-5xl font-black text-blue-600 tabular-nums">
+                                            {confirmedAge}
+                                        </div>
+                                        <p className="text-xs text-gray-400 font-medium">גיל לאווטאר</p>
+                                    </div>
+
+                                    <button
+                                        onClick={confirmAgeAndGenerate}
+                                        className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <span>אשר וצור קסם ✨</span>
+                                        <ArrowRight size={20} />
+                                    </button>
+                                </motion.div>
+                            )}
                         </AnimatePresence>
 
                         {(isAnalyzingPhoto || isGeneratingAvatar || isImageLoading) && (
