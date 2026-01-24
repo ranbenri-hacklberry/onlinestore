@@ -83,6 +83,7 @@ export default function NurseryPage() {
                     setError('שגיאה בטעינת הצמחים');
                 } else {
                     setPlants(plantsData || []);
+                    console.log('PLANTS FROM API:', (plantsData || []).map((p: any) => ({ id: p.id, name: p.name })));
                 }
             } catch (e) {
                 console.error('Error loading data:', e);

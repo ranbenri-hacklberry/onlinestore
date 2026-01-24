@@ -50,16 +50,10 @@ export default function NurseryCategoryFilter({
     return (
         <div className="flex flex-col items-center gap-4 w-full">
             {/* Main Categories */}
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:flex lg:justify-center lg:flex-wrap gap-1.5 w-full px-1">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:flex lg:flex-row lg:items-stretch gap-2 w-full px-1">
                 {displayCategories.map((category, index) => {
                     const isActive = category.id === activeCategory ||
                         (category.name === 'שיחים ועצים' && isTreeRelatedActive);
-
-                    // Specific logic for layout span if we want the last item to be full width in odd cases
-                    // But usually 3 cols is fine.
-                    const isLast = index === displayCategories.length - 1;
-                    const isOddTotal = displayCategories.length % 3 !== 0;
-                    // Let's keep it simple grid for now, 3 cols fits nicely on mobile
 
                     // Split name into lines
                     const safeName = category.name || '';
@@ -71,7 +65,7 @@ export default function NurseryCategoryFilter({
                             key={category.id}
                             onClick={() => onCategoryChange(category.id)}
                             className={`
-                                relative flex items-center justify-center px-1 py-1 rounded-lg font-chalk transition-all duration-300 w-full h-full min-h-[55px]
+                                relative flex items-center justify-center px-4 py-2 rounded-lg font-chalk transition-all duration-300 w-full lg:flex-1 h-full min-h-[55px]
                                 ${isActive
                                     ? 'bg-[#7a8c6e] text-white shadow-md'
                                     : 'bg-[#7a8c6e]/10 text-[#7a8c6e] hover:bg-[#7a8c6e]/20 border border-[#7a8c6e]/20'
