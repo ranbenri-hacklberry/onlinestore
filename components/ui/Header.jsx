@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Icon from '../AppIcon';
 import { recordTimeClockEvent, getEmployeeClockStatus } from '../../services/timeClockService';
@@ -17,7 +17,8 @@ const Header = memo(({
   const [isClockedIn, setIsClockedIn] = useState(false);
   const [isClockingOut, setIsClockingOut] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const navigate = useNavigate();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
 
   // Update current time every minute
   useEffect(() => {

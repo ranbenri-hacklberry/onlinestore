@@ -1,0 +1,22 @@
+{
+    "name": "icaffeos-mcp-server",
+    "version": "1.0.0",
+    "description": "MCP server for icaffeOS Supabase backend",
+    "main": "build/server.js",
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "start": "node build/server.js",
+        "dev": "tsc --watch"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "latest",
+        "pg": "^8.11.0",
+        "dotenv": "^16.3.1"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "@types/pg": "^8.6.6",
+        "typescript": "^5.0.0"
+    }
+}

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>דוח ניתוח ביצועים - עגלת קפה</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 40px;
+            color: #333;
+        }
+
+        h1,
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #3498db;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: right;
+        }
+
+        th {
+            background: #efefef;
+            color: #2c3e50;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        .highlight-red {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .highlight-green {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .summary-box {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.6;
+            border: 1px solid #3498db;
+        }
+
+        .footer {
+            margin-top: 50px;
+            font-size: 12px;
+            color: #7f8c8d;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>📊 דוח ניתוח ביצועים שבועי - עגלת קפה</h1>
+    <p><strong>תאריכים:</strong> 11/01/2026 - 17/01/2026 | <strong>מיקום:</strong> מעלה אפרים</p>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div>סה"כ פדיון שבועי</div>
+            <div class="stat-value">₪23,706.00</div>
+        </div>
+        <div class="stat-card">
+            <div>סה"כ הזמנות</div>
+            <div class="stat-value">368</div>
+        </div>
+        <div class="stat-card">
+            <div>זמן הכנה ממוצע</div>
+            <div class="stat-value">16.2 דק'</div>
+        </div>
+    </div>
+
+    <h2>📅 פדיון יומי והשוואת ימי השבוע</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>תאריך</th>
+                <th>יום</th>
+                <th>הזמנות</th>
+                <th>פדיון (₪)</th>
+                <th>סטטוס</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>11/01</td>
+                <td>ראשון</td>
+                <td>94</td>
+                <td>₪4,965</td>
+                <td>חזק</td>
+            </tr>
+            <tr>
+                <td>12/01</td>
+                <td>שני</td>
+                <td>51</td>
+                <td>₪2,918</td>
+                <td>בינוני</td>
+            </tr>
+            <tr style="background: #ffd6d6">
+                <td>13/01</td>
+                <td>שלישי</td>
+                <td>19</td>
+                <td>₪973</td>
+                <td class="highlight-red">גשם כבד</td>
+            </tr>
+            <tr>
+                <td>14/01</td>
+                <td>רביעי</td>
+                <td>37</td>
+                <td>₪1,846</td>
+                <td>התאוששות</td>
+            </tr>
+            <tr>
+                <td>15/01</td>
+                <td>חמישי</td>
+                <td>56</td>
+                <td>₪4,043</td>
+                <td>חזק</td>
+            </tr>
+            <tr style="background: #d4edda">
+                <td>16/01</td>
+                <td>שישי</td>
+                <td>111</td>
+                <td>₪8,959</td>
+                <td class="highlight-green">שיא שבועי</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>⏰ זמני הכנה ועומס לפי שעות (ממוצע שבועי)</h2>
+    <p>צוואר הבקבוק המרכזי מזוהה בשעות הבוקר המאוחרות.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>שעה</th>
+                <th>כמות הזמנות</th>
+                <th>זמן הכנה ממוצע (דק')</th>
+                <th>ניתוח עומס</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>09:00</td>
+                <td>50</td>
+                <td class="highlight-red">18.7</td>
+                <td>חריגה מהתקן (לחץ בוקר)</td>
+            </tr>
+            <tr>
+                <td>10:00</td>
+                <td>50</td>
+                <td class="highlight-red">20.3</td>
+                <td><strong>צוואר בקבוק מרכזי</strong></td>
+            </tr>
+            <tr>
+                <td>11:00</td>
+                <td>78</td>
+                <td>14.7</td>
+                <td>שיא הזמנות - עבודה יעילה</td>
+            </tr>
+            <tr>
+                <td>12:00</td>
+                <td>59</td>
+                <td>12.3</td>
+                <td>תפעול מצוין</td>
+            </tr>
+            <tr>
+                <td>13:00</td>
+                <td>41</td>
+                <td>13.5</td>
+                <td>בינוני</td>
+            </tr>
+            <tr>
+                <td>14:00</td>
+                <td>30</td>
+                <td>14.8</td>
+                <td>הפוגה</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>🔍 ניתוח צווארי בקבוק ותובנות</h2>
+    <div class="summary-box">
+        <ul>
+            <li><strong>יום שישי מול השבוע:</strong> יום שישי מהווה <strong>38% מהפדיון השבועי</strong>. למרות העומס
+                (111 הזמנות), זמני ההכנה נשמרים יציבים יחסית, מה שמעיד על תיגבור נכון של צוות או הכנה מוקדמת טובה.</li>
+            <li><strong>צוואר בקבוק ב-10:00 בבוקר:</strong> זמן ההכנה הממוצע מזנק ל-20.3 דקות. זהו השלב שבו נכנסות
+                הזמנות הבוקר המורכבות (ארוחות בוקר/טוסטים) במקביל לפיק של הקפה. </li>
+            <li><strong>השפעה אקלימית:</strong> יום שלישי הגשום הוריד את הממוצע השבועי. קיימת תלות של 100% במזג האוויר
+                בגלל אופי ה"עגלה".</li>
+            <li><strong>שעות מתות:</strong> החל מהשעה 15:00 קיימת צניחה חדה בביקוש. מומלץ לצמצם צוות מטבח ולהעביר את
+                העבודה לשימור ותחזוקה.</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        הופק ע"י מערכת הניתוח של icaffeOS | תאריך הפקה: 18/01/2026
+    </div>
+</body>
+
+</html>
