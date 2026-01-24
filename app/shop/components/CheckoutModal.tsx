@@ -455,7 +455,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, cartTotal, o
                 selectedStyle,
                 avatarPrompt,
                 (googleApiKey || undefined) as any,
-                confirmedAge // FORCE MANUAL AGE
+                confirmedAge as any // FORCE MANUAL AGE TYPE FIX
             );
 
             clearTimeout(genTimer);

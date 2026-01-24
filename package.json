@@ -25,10 +25,12 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
+    "pg": "^8.17.1",
     "qs": "^6.14.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-leaflet": "^5.0.0",
+    "react-markdown": "^10.1.0",
     "tailwind-merge": "^3.4.0",
     "uuid": "^13.0.0"
   },
