@@ -12,12 +12,12 @@ const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-type OrderStatus = 'preparing' | 'ready' | 'delivered';
+type OrderStatus = 'pending' | 'in_progress' | 'ready' | 'completed' | 'cancelled';
 type PageState = 'loading' | 'ready-to-upload' | 'uploading' | 'success' | 'too-late' | 'error' | 'not-found';
 
 interface Order {
     id: string;
-    status: OrderStatus;
+    order_status: OrderStatus;
     customer_name: string | null;
 }
 
@@ -31,6 +31,7 @@ export default function StickerPage() {
     const [order, setOrder] = useState<Order | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [uploadProgress, setUploadProgress] = useState<string>('');
+    const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -44,7 +45,7 @@ export default function StickerPage() {
         const fetchOrder = async () => {
             const { data, error } = await supabase
                 .from('orders')
-                .select('id, status, customer_name')
+                .select('id, order_status, customer_name')
                 .eq('id', orderId)
                 .single();
 
@@ -55,7 +56,7 @@ export default function StickerPage() {
             }
 
             setOrder(data as Order);
-            updatePageStateFromOrder(data.status as OrderStatus);
+            updatePageStateFromOrder(data.order_status as OrderStatus);
         };
 
         fetchOrder();
@@ -74,7 +75,7 @@ export default function StickerPage() {
                 (payload) => {
                     const newOrder = payload.new as Order;
                     setOrder(newOrder);
-                    updatePageStateFromOrder(newOrder.status);
+                    updatePageStateFromOrder(newOrder.order_status);
                 }
             )
             .subscribe();
@@ -85,7 +86,8 @@ export default function StickerPage() {
     }, [orderId]);
 
     const updatePageStateFromOrder = (status: OrderStatus) => {
-        if (status === 'preparing') {
+        // Allow upload when order is pending or in_progress
+        if (status === 'pending' || status === 'in_progress') {
             setPageState('ready-to-upload');
         } else {
             setPageState('too-late');
@@ -147,6 +149,12 @@ export default function StickerPage() {
                 throw new Error(`Queue insert failed: ${queueError.message}`);
             }
 
+            // Get public URL for preview
+            const { data: { publicUrl } } = supabase.storage
+                .from('stickers')
+                .getPublicUrl(filePath);
+
+            setUploadedUrl(publicUrl);
             setPageState('success');
         } catch (err) {
             console.error('Upload error:', err);
@@ -176,7 +184,7 @@ export default function StickerPage() {
             case 'uploading':
                 return <UploadingState progress={uploadProgress} />;
             case 'success':
-                return <SuccessState customerName={order?.customer_name} />;
+                return <SuccessState customerName={order?.customer_name} previewUrl={uploadedUrl} />;
             case 'ready-to-upload':
                 return (
                     <ReadyToUploadState
@@ -193,7 +201,7 @@ export default function StickerPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-purple-950 flex flex-col items-center justify-center p-6 font-heebo" dir="rtl">
+        <div className="min-h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-purple-950 flex flex-col items-center justify-center p-6" dir="rtl" style={{ fontFamily: 'var(--font-heebo), Heebo, Arial, sans-serif' }}>
             {/* Hidden file input */}
             <input
                 ref={fileInputRef}
@@ -324,17 +332,74 @@ function UploadingState({ progress }: { progress: string }) {
     );
 }
 
-function SuccessState({ customerName }: { customerName?: string | null }) {
+function SuccessState({ customerName, previewUrl }: { customerName?: string | null; previewUrl: string | null }) {
     return (
         <div className="flex flex-col items-center gap-6 text-center">
             <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', bounce: 0.5, delay: 0.1 }}
-                className="relative"
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', bounce: 0.4, delay: 0.1 }}
+                className="relative mb-4"
             >
-                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-2xl shadow-green-500/30">
-                    <CheckCircle2 size={64} className="text-white" />
+                {/* Coffee Cup Mockup */}
+                <div className="relative w-80 h-80 mx-auto perspective-1000">
+                    <img
+                        src="/cup_mockup.png"
+                        alt="Coffee Cup"
+                        className="w-full h-full object-contain drop-shadow-2xl"
+                    />
+
+                    {/* The Sticker Preview overlaid on the cup */}
+                    {previewUrl && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 1.2, duration: 0.8 }}
+                            className="absolute top-[52%] left-[51%] -translate-x-1/2 -translate-y-1/2 w-[34%] aspect-square bg-white shadow-2xl overflow-hidden rounded-[10%]"
+                            style={{
+                                perspective: '1000px',
+                                transform: 'translateX(-50%) translateY(-50%) rotateY(-10deg) rotate(1deg)',
+                                boxShadow: '0 2px 12px rgba(0,0,0,0.4)',
+                            }}
+                        >
+                            {/* Sticker Content with Thermal Effect */}
+                            <div className="relative w-full h-full flex flex-col bg-white">
+                                {/* Thin inner border with more rounded feel */}
+                                <div className="absolute inset-1.5 border border-black/20 rounded-[8%] pointer-events-none z-20" />
+
+                                {/* Image Area */}
+                                <div className="flex-1 overflow-hidden m-2.5 rounded-[5%] bg-zinc-100">
+                                    <img
+                                        src={previewUrl}
+                                        alt="Your Sticker"
+                                        className="w-full h-full object-cover"
+                                        style={{
+                                            filter: 'grayscale(1) contrast(1.6) brightness(1.1) sepia(0.1)',
+                                            mixBlendMode: 'darken',
+                                            opacity: 0.95
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Refined Footer Area */}
+                                <div className="bg-stone-900 text-white pb-2 pt-1 px-1 flex flex-col items-center justify-center relative">
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-900 rounded-full p-0.5 border border-white/10">
+                                        <Coffee size={8} className="text-amber-500" />
+                                    </div>
+                                    <span className="text-[5px] font-bold tracking-widest text-stone-400 uppercase opacity-80">iCaffe Order</span>
+                                    <span className="text-[8px] font-black leading-none mt-0.5">#104</span>
+                                    <span className="text-[4px] font-medium leading-none mt-1 text-stone-300">קפוצ׳ינו • חלב שיבולת</span>
+                                </div>
+
+                                {/* Dithering Texture Overlay - Softened */}
+                                <div className="absolute inset-0 opacity-[0.06] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] z-30" />
+                            </div>
+                        </motion.div>
+                    )}
+                </div>
+
+                <div className="absolute -top-4 -right-4 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center shadow-lg border-2 border-stone-900">
+                    <CheckCircle2 size={24} className="text-white" />
                 </div>
 
                 {/* Sparkle effects */}
@@ -342,7 +407,7 @@ function SuccessState({ customerName }: { customerName?: string | null }) {
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3 }}
-                    className="absolute -top-2 -right-2"
+                    className="absolute top-10 -right-4"
                 >
                     <Sparkles size={24} className="text-amber-400" />
                 </motion.div>
@@ -350,7 +415,7 @@ function SuccessState({ customerName }: { customerName?: string | null }) {
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="absolute -bottom-1 -left-3"
+                    className="absolute bottom-20 -left-6"
                 >
                     <Sparkles size={20} className="text-purple-400" />
                 </motion.div>
@@ -363,10 +428,10 @@ function SuccessState({ customerName }: { customerName?: string | null }) {
             >
                 <h1 className="text-2xl font-bold text-white mb-2">מעולה! 🎉</h1>
                 <p className="text-stone-400 text-lg">
-                    התמונה בדרך למדפסת
+                    זה נראה מדהים! התמונה בדרך למדפסת.
                     <br />
                     <span className="text-amber-500">
-                        הסטיקר יחכה לך עם הקפה!
+                        הסטיקר יחכה לך מודבק על הקפה!
                     </span>
                 </p>
             </motion.div>
@@ -375,11 +440,11 @@ function SuccessState({ customerName }: { customerName?: string | null }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="mt-4 px-6 py-3 bg-stone-800/50 rounded-2xl border border-stone-700"
+                className="mt-2 px-6 py-3 bg-stone-800/30 rounded-2xl border border-stone-700/50 backdrop-blur-sm"
             >
                 <p className="text-stone-500 text-sm">
                     {customerName ? `תודה ${customerName}! ` : ''}
-                    אפשר לסגור את הדף
+                    כשזה יהיה מוכן, נצעק את שמך!
                 </p>
             </motion.div>
         </div>

@@ -14,6 +14,7 @@ interface PlantItem {
     in_stock?: boolean;
     care_level?: 'easy' | 'medium' | 'hard';
     light_needs?: 'low' | 'medium' | 'high';
+    modifiers?: any[];
 }
 
 interface PlantCardProps {
@@ -41,8 +42,26 @@ export default function PlantCard({ plant, index = 0, onClick }: PlantCardProps)
     const defaultImage = 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?q=80&w=500&auto=format&fit=crop';
     const imageUrl = imageError ? defaultImage : (plant.image_url || defaultImage);
 
-    // Parse description for sizes if applicable
+    // Parse sizes from JSONB modifiers (Priority 1) or legacy description JSON (Priority 2)
     const parsedSizes = (() => {
+        // Priority 1: Use the new 'modifiers' JSONB field
+        if (plant.modifiers && Array.isArray(plant.modifiers)) {
+            const sizeGroup = plant.modifiers.find(m => m.group === 'גודל' || m.title === 'גודל');
+            if (sizeGroup) {
+                const options = sizeGroup.options || sizeGroup.values || [];
+                if (options.length > 0) {
+                    const sizesObj: Record<string, number> = {};
+                    options.forEach((opt: any) => {
+                        const basePrice = Number(plant.price || 0);
+                        const adjustment = Number(opt.price || opt.priceAdjustment || 0);
+                        sizesObj[opt.name || opt.value_name] = basePrice + adjustment;
+                    });
+                    return sizesObj;
+                }
+            }
+        }
+
+        // Priority 2: Fallback to old description JSON
         try {
             const data = JSON.parse(plant.description || '');
             if (typeof data === 'object' && Object.keys(data).length > 0) return data;
