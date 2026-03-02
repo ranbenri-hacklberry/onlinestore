@@ -55,6 +55,30 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 },
             },
             {
+                name: "get_users",
+                description: "Fetch all users from the database.",
+                inputSchema: {
+                    type: "object",
+                    properties: {},
+                },
+            },
+            {
+                name: "get_employees",
+                description: "Fetch all employees from the database.",
+                inputSchema: {
+                    type: "object",
+                    properties: {},
+                },
+            },
+            {
+                name: "list_functions",
+                description: "Fetch all functions from the database.",
+                inputSchema: {
+                    type: "object",
+                    properties: {},
+                },
+            },
+            {
                 name: "query_db",
                 description: "Execute a read-only SELECT query against the icaffeOS Supabase backend. Use this to fetch live data about orders, inventory (weight-to-unit), or customer loyalty points. MUST BE A SELECT QUERY ONLY.",
                 inputSchema: {
@@ -102,6 +126,27 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         ORDER BY ordinal_position;
       `;
             const result = await pool.query(query, [table_name]);
+            return {
+                content: [{ type: "text", text: JSON.stringify(result.rows, null, 2) }],
+            };
+        }
+
+        if (name === "get_users") {
+            const result = await pool.query("SELECT * FROM auth.users");
+            return {
+                content: [{ type: "text", text: JSON.stringify(result.rows, null, 2) }],
+            };
+        }
+
+        if (name === "get_employees") {
+            const result = await pool.query("SELECT * FROM public.employees");
+            return {
+                content: [{ type: "text", text: JSON.stringify(result.rows, null, 2) }],
+            };
+        }
+
+        if (name === "list_functions") {
+            const result = await pool.query("SELECT routine_name, routine_type FROM information_schema.routines WHERE specific_schema = 'public' ORDER BY routine_name;");
             return {
                 content: [{ type: "text", text: JSON.stringify(result.rows, null, 2) }],
             };

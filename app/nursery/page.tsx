@@ -33,6 +33,7 @@ interface Plant {
     category?: string;
     category_id: string;
     is_in_stock: boolean;
+    modifiers?: any[];
 }
 
 export default function NurseryPage() {
@@ -73,7 +74,7 @@ export default function NurseryPage() {
                 // Fetch menu items (plants)
                 const { data: plantsData, error: plantsError } = await supabase
                     .from('menu_items')
-                    .select('id, name, price, image_url, description, category, category_id, is_in_stock')
+                    .select('id, name, price, image_url, description, category, category_id, is_in_stock, modifiers')
                     .eq('business_id', BUSINESS_ID)
                     .or('is_deleted.is.null,is_deleted.eq.false')
                     .order('name', { ascending: true });
