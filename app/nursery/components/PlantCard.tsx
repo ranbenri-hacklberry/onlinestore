@@ -89,7 +89,7 @@ export default function PlantCard({ plant, index = 0, onClick }: PlantCardProps)
                 )}
 
                 {/* Image Container */}
-                <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
+                <div className="relative aspect-square overflow-hidden bg-stone-100">
                     {!imageLoaded && (
                         <div className="absolute inset-0 animate-pulse bg-stone-200 flex items-center justify-center">
                             <span className="opacity-20 text-3xl">🌿</span>
