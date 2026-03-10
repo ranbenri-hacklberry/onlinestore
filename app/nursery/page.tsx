@@ -11,6 +11,7 @@ import NurseryCategoryFilter from './components/NurseryCategoryFilter';
 import StoreFooter from '@/components/StoreFooter';
 import PlantCard from './components/PlantCard';
 import WhatsAppButton from './components/WhatsAppButton';
+import ProductDetailModal from './components/ProductDetailModal';
 
 // Business ID for שפת המדבר
 const BUSINESS_ID = '8e4e05da-2d99-4bd9-aedf-8e54cbde930a';
@@ -45,6 +46,10 @@ export default function NurseryPage() {
     // Filter logic state
     const [subCategoryFilter, setSubCategoryFilter] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Detailed Modal State
+    const [showProductDetailModal, setShowProductDetailModal] = useState(false);
+    const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
 
     // Fetch data from Supabase
     useEffect(() => {
@@ -160,9 +165,10 @@ export default function NurseryPage() {
         return items;
     }, [activeCategory, subCategoryFilter, plants, categories, searchQuery]);
 
-    // Handle plant click - just log for now (catalog mode)
+    // Handle plant click - open detailed view
     const handlePlantClick = (plant: Plant) => {
-        console.log('Plant clicked:', plant.name);
+        setSelectedPlant(plant);
+        setShowProductDetailModal(true);
     };
 
     return (
@@ -331,6 +337,13 @@ export default function NurseryPage() {
             <WhatsAppButton
                 phoneNumber="+972556822072"
                 message="שלום, אשמח לשמוע על הצמחים שלכם 🌱"
+            />
+
+            {/* Product Detail Modal */}
+            <ProductDetailModal
+                isOpen={showProductDetailModal}
+                onClose={() => setShowProductDetailModal(false)}
+                plant={selectedPlant as any}
             />
 
             {/* Version */}
