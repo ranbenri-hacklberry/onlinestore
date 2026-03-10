@@ -68,7 +68,7 @@ export default function RootLayout({
       <head>
         <meta name="google" content="notranslate" />
       </head>
-      <body className={`${heebo.variable} ${assistant.variable} font-chalk text-[22px] antialiased bg-white text-gray-900`}>
+      <body className={`${heebo.variable} ${assistant.variable} font-assistant antialiased bg-white text-gray-900 text-lg`}>
         {children}
       </body>
     </html>

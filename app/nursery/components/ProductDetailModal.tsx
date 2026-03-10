@@ -1,18 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     X,
     Droplets,
     Sun,
-    Wind,
+    Zap,
     Info,
-    ChevronRight,
-    MessageCircle,
-    TreePine,
     CheckCircle2,
-    CalendarDays
+    CalendarDays,
+    MessageCircle,
+    ChevronRight
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -92,16 +91,16 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                         </div>
 
                         {/* Info Section */}
-                        <div className="w-full md:w-7/12 flex flex-col p-5 md:p-10 overflow-y-auto scrollbar-hide">
+                        <div className="w-full md:w-7/12 flex flex-col p-5 md:p-10 overflow-y-auto scrollbar-hide font-assistant">
                             {/* Header */}
                             <div className="mb-6 relative">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="bg-emerald-100/80 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-assistant">
+                                    <span className="bg-emerald-100/80 text-emerald-700 px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-wider font-assistant">
                                         {plant.category || 'צמחים'}
                                     </span>
                                     {plant.in_stock !== false && (
-                                        <span className="flex items-center gap-1 text-emerald-600 text-[10px] font-bold font-assistant">
-                                            <CheckCircle2 size={12} />
+                                        <span className="flex items-center gap-1 text-emerald-600 text-[12px] font-bold font-assistant">
+                                            <CheckCircle2 size={14} />
                                             זמין במלאי
                                         </span>
                                     )}
@@ -118,8 +117,8 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                             </div>
 
                             {/* Description - Brief paragraph */}
-                            <div className="mb-6">
-                                <p className="text-stone-600 leading-relaxed text-lg font-assistant text-right font-medium">
+                            <div className="mb-8">
+                                <p className="text-stone-600 leading-relaxed text-xl font-assistant text-right font-medium">
                                     {plant.name.includes('אמנון ותמר') ?
                                         "אמנון ותמר הוא אחד מפרחי החורף האהובים והצבעוניים ביותר. הוא מצטיין בפריחה שופעת במגוון צבעים מרהיבים, עמיד לקור היטב ומתאים מאוד לעציצים, אדניות או לשתילה בגינה ליצירת מרבדי צבע קסומים." :
                                         (plant.description || "טרם עדכנו תיאור מפורט לצמח זה, אך אתם מוזמנים לשלוח הודעה לנתי ולהתייעץ על כל מה שחשוב!")
@@ -128,28 +127,28 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                             </div>
 
                             {/* Care Grid - Compact Row */}
-                            <div className="bg-stone-50 rounded-2xl p-4 border border-stone-100 mb-6 font-assistant">
+                            <div className="bg-stone-50 rounded-2xl p-5 border border-stone-100 mb-8 font-assistant">
                                 <div className="flex justify-between items-center text-center">
                                     <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
-                                        <CalendarDays size={20} className="text-rose-500 mb-1.5" />
-                                        <span className="text-[14px] md:text-lg font-bold text-stone-700 leading-none">
+                                        <CalendarDays size={26} className="text-rose-500 mb-2" />
+                                        <span className="text-[16px] md:text-xl font-bold text-stone-700 leading-none">
                                             {plant.name.includes('אמנון ותמר') ? 'חורף-אביב' : (plant.season || 'כל השנה')}
                                         </span>
                                     </div>
 
                                     <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
-                                        <Sun size={20} className="text-amber-500 mb-1.5" />
-                                        <span className="text-[14px] md:text-lg font-bold text-stone-700 leading-none">{plant.light_needs || 'חצי צל'}</span>
+                                        <Sun size={26} className="text-amber-500 mb-2" />
+                                        <span className="text-[16px] md:text-xl font-bold text-stone-700 leading-none">{plant.light_needs || 'חצי צל'}</span>
                                     </div>
 
                                     <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
-                                        <Droplets size={20} className="text-blue-500 mb-1.5" />
-                                        <span className="text-[14px] md:text-lg font-bold text-stone-700 leading-none">{plant.water_needs || 'בינונית'}</span>
+                                        <Droplets size={26} className="text-blue-500 mb-2" />
+                                        <span className="text-[16px] md:text-xl font-bold text-stone-700 leading-none">{plant.water_needs || 'בינונית'}</span>
                                     </div>
 
                                     <div className="flex-1 flex flex-col items-center">
-                                        <TreePine size={20} className="text-emerald-500 mb-1.5" />
-                                        <span className="text-[14px] md:text-lg font-bold text-stone-700 leading-none">{plant.care_level || 'קל'}</span>
+                                        <Zap size={26} className="text-emerald-500 mb-2" />
+                                        <span className="text-[16px] md:text-xl font-bold text-stone-700 leading-none">{plant.care_level || 'קל'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -158,13 +157,13 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                             <div className="mt-auto pt-4 border-t border-stone-100">
                                 <button
                                     onClick={openWhatsApp}
-                                    className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-3 active:scale-[0.98] font-assistant"
+                                    className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-4 rounded-xl font-bold text-xl transition-all shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-3 active:scale-[0.98] font-assistant"
                                 >
-                                    <MessageCircle size={22} className="text-white" />
+                                    <MessageCircle size={24} className="text-white" />
                                     תיאום רכישה בווטסאפ
-                                    <ChevronRight size={18} className="mr-auto opacity-30" />
+                                    <ChevronRight size={20} className="mr-auto opacity-30" />
                                 </button>
-                                <p className="text-center text-stone-400 text-sm mt-4 font-medium italic">
+                                <p className="text-center text-stone-400 text-sm mt-4 font-medium italic font-assistant">
                                     נתי זמין עבורכם לכל שאלה מקצועית בווטסאפ
                                 </p>
                             </div>
