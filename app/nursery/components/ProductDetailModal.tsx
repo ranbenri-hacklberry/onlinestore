@@ -11,7 +11,8 @@ import {
     ChevronRight,
     MessageCircle,
     TreePine,
-    CheckCircle2
+    CheckCircle2,
+    CalendarDays
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -27,6 +28,7 @@ interface PlantItem {
     light_needs?: 'low' | 'medium' | 'high' | string;
     water_needs?: 'low' | 'medium' | 'high' | string;
     temperature?: string;
+    season?: string;
     modifiers?: any[];
 }
 
@@ -66,7 +68,7 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row font-heebo"
+                        className="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl max-h-[95vh] md:max-h-[90vh] overflow-hidden flex flex-col md:flex-row font-assistant"
                     >
                         {/* Close Button */}
                         <button
@@ -77,7 +79,7 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                         </button>
 
                         {/* Image Section */}
-                        <div className="w-full md:w-1/2 h-64 md:h-auto relative bg-stone-100">
+                        <div className="w-full md:w-5/12 h-48 md:h-auto relative bg-stone-100 shrink-0">
                             <Image
                                 src={imageUrl}
                                 alt={plant.name}
@@ -98,7 +100,7 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                         </div>
 
                         {/* Info Section */}
-                        <div className="w-full md:w-1/2 flex flex-col p-8 md:p-12 overflow-y-auto">
+                        <div className="w-full md:w-7/12 flex flex-col p-5 md:p-10 overflow-y-auto scrollbar-hide">
                             {/* Header */}
                             <div className="mb-8">
                                 <div className="flex items-center gap-2 mb-2">
@@ -106,85 +108,67 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                                         {plant.category || 'צמחים'}
                                     </span>
                                     {plant.in_stock !== false && (
-                                        <span className="flex items-center gap-1 text-emerald-600 text-xs font-bold">
-                                            <CheckCircle2 size={14} />
+                                        <span className="flex items-center gap-1 text-emerald-600 text-[10px] font-bold">
+                                            <CheckCircle2 size={12} />
                                             זמין במלאי
                                         </span>
                                     )}
                                 </div>
-                                <h2 className="text-4xl md:text-5xl font-black text-stone-800 leading-tight mb-4 font-rubik">
+                                <h2 className="text-4xl md:text-5xl font-chalk text-stone-800 leading-tight mb-2 tracking-wide">
                                     {plant.name}
                                 </h2>
 
-                                <div className="hidden md:block">
-                                    <span className="text-4xl font-black text-emerald-600">₪{plant.price}</span>
-                                    <span className="text-stone-400 mr-2 text-sm font-medium">כולל מע"מ</span>
+                                <div className="md:block">
+                                    <span className="text-3xl font-chalk text-emerald-600 tracking-wider">₪{plant.price}</span>
+                                    <span className="text-stone-400 mr-2 text-[10px] uppercase font-bold tracking-widest hidden md:inline">מחיר קטלוגי</span>
                                 </div>
                             </div>
 
-                            {/* Care Grid */}
-                            <div className="grid grid-cols-2 gap-4 mb-10">
-                                <div className="bg-stone-50 rounded-2xl p-4 border border-stone-100 flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600">
-                                        <Sun size={20} />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-stone-400 font-bold leading-none mb-1">אור</p>
-                                        <p className="text-sm font-bold text-stone-700 leading-none">{plant.light_needs || 'שמש חלקית'}</p>
-                                    </div>
-                                </div>
-
-                                <div className="bg-stone-50 rounded-2xl p-4 border border-stone-100 flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
-                                        <Droplets size={20} />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-stone-400 font-bold leading-none mb-1">השקיה</p>
-                                        <p className="text-sm font-bold text-stone-700 leading-none">{plant.water_needs || 'בינונית'}</p>
-                                    </div>
-                                </div>
-
-                                <div className="bg-stone-50 rounded-2xl p-4 border border-stone-100 flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
-                                        <TreePine size={20} />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-stone-400 font-bold leading-none mb-1">קושי</p>
-                                        <p className="text-sm font-bold text-stone-700 leading-none">{plant.care_level || 'קל'}</p>
-                                    </div>
-                                </div>
-
-                                <div className="bg-stone-50 rounded-2xl p-4 border border-stone-100 flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center text-rose-600">
-                                        <Wind size={20} />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-stone-400 font-bold leading-none mb-1">טמפ'</p>
-                                        <p className="text-sm font-bold text-stone-700 leading-none">{plant.temperature || 'נוחה'}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Description */}
-                            <div className="mb-10">
-                                <h3 className="text-lg font-black text-stone-800 mb-3 flex items-center gap-2">
-                                    <Info size={18} className="text-stone-400" />
-                                    על הצמח
-                                </h3>
-                                <p className="text-stone-600 leading-relaxed text-lg">
+                            {/* Description - Brief paragraph */}
+                            <div className="mb-6">
+                                <p className="text-stone-600 leading-snug text-lg font-assistant text-right font-medium">
                                     {plant.description || "טרם עדכנו תיאור מפורט לצמח זה, אך אתם מוזמנים לשלוח הודעה לנתי ולהתייעץ על כל מה שחשוב!"}
                                 </p>
                             </div>
 
+                            {/* Care Grid - Compact Row */}
+                            <div className="bg-stone-50 rounded-2xl p-3 border border-stone-100 mb-6 font-assistant">
+                                <div className="flex justify-between items-center text-center">
+                                    <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
+                                        <CalendarDays size={18} className="text-rose-500 mb-1" />
+                                        <span className="text-[10px] text-stone-400 font-bold mb-0.5">עונה</span>
+                                        <span className="text-[12px] font-bold text-stone-700 line-clamp-1 break-all">{plant.season || 'כל השנה'}</span>
+                                    </div>
+
+                                    <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
+                                        <Sun size={18} className="text-amber-500 mb-1" />
+                                        <span className="text-[10px] text-stone-400 font-bold mb-0.5">שמש</span>
+                                        <span className="text-[12px] font-bold text-stone-700 line-clamp-1 break-all">{plant.light_needs || 'חצי צל'}</span>
+                                    </div>
+
+                                    <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
+                                        <Droplets size={18} className="text-blue-500 mb-1" />
+                                        <span className="text-[10px] text-stone-400 font-bold mb-0.5">השקיה</span>
+                                        <span className="text-[12px] font-bold text-stone-700 line-clamp-1 break-all">{plant.water_needs || 'בינונית'}</span>
+                                    </div>
+
+                                    <div className="flex-1 flex flex-col items-center">
+                                        <TreePine size={18} className="text-emerald-500 mb-1" />
+                                        <span className="text-[10px] text-stone-400 font-bold mb-0.5">קושי</span>
+                                        <span className="text-[12px] font-bold text-stone-700 line-clamp-1 break-all">{plant.care_level || 'קל'}</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* CTA Section */}
-                            <div className="mt-auto pt-6 border-t border-stone-100">
+                            <div className="mt-auto pt-4 border-t border-stone-100">
                                 <button
                                     onClick={openWhatsApp}
-                                    className="w-full bg-stone-900 hover:bg-black text-white py-5 rounded-2xl font-black text-xl transition-all shadow-xl shadow-stone-200 flex items-center justify-center gap-3 active:scale-[0.98]"
+                                    className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-3 active:scale-[0.98] font-assistant"
                                 >
-                                    <MessageCircle size={24} className="text-emerald-400" />
-                                    לפרטים נוספים והזמנה
-                                    <ChevronRight size={20} className="mr-auto opacity-30" />
+                                    <MessageCircle size={22} className="text-white" />
+                                    תיאום רכישה בווטסאפ
+                                    <ChevronRight size={18} className="mr-auto opacity-30" />
                                 </button>
                                 <p className="text-center text-stone-400 text-sm mt-4 font-medium italic">
                                     נתי זמין עבורכם לכל שאלה מקצועית בווטסאפ
