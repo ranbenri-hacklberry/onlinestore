@@ -67,7 +67,7 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl max-h-[92vh] md:max-h-[90vh] flex flex-col md:flex-row font-assistant overflow-hidden"
+                        className="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl max-h-[90vh] md:max-h-[90vh] flex flex-col md:flex-row font-assistant overflow-hidden"
                     >
                         {/* Close Button */}
                         <button
@@ -78,7 +78,7 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                         </button>
 
                         {/* Image Section */}
-                        <div className="w-full md:w-5/12 h-48 md:h-auto relative bg-stone-100 shrink-0">
+                        <div className="w-full md:w-5/12 h-56 md:h-auto relative bg-stone-100 shrink-0">
                             <Image
                                 src={imageUrl}
                                 alt={plant.name}
@@ -91,9 +91,9 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                         </div>
 
                         {/* Info Section */}
-                        <div className="w-full md:w-7/12 flex flex-col p-6 md:p-10 overflow-y-auto scrollbar-hide font-assistant">
+                        <div className="w-full md:w-7/12 flex flex-col p-5 md:p-10 overflow-y-auto scrollbar-hide font-assistant">
                             {/* Header */}
-                            <div className="mb-6 relative">
+                            <div className="mb-4 relative">
                                 <div className="flex items-center gap-2 mb-1">
                                     <span className="bg-emerald-100/80 text-emerald-700 px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-assistant">
                                         {plant.category || 'צמחים'}
@@ -116,8 +116,8 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                                 </div>
                             </div>
 
-                            {/* Description - Restored Comfort */}
-                            <div className="mb-6">
+                            {/* Description - Compacted to save space for larger image */}
+                            <div className="mb-4">
                                 <p className="text-stone-600 leading-relaxed text-lg md:text-xl font-assistant text-right font-medium">
                                     {plant.name.includes('אמנון ותמר') ?
                                         "אמנון ותמר הוא אחד מפרחי החורף האהובים והצבעוניים ביותר. הוא מצטיין בפריחה שופעת במגוון צבעים מרהיבים, עמיד לקור היטב ומתאים מאוד לעציצים ואדניות." :
@@ -126,8 +126,8 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                                 </p>
                             </div>
 
-                            {/* Care Grid - Balanced Row */}
-                            <div className="bg-stone-50 rounded-2xl p-5 border border-stone-100 mb-6 font-assistant">
+                            {/* Care Grid - Tightened for larger image */}
+                            <div className="bg-stone-50 rounded-2xl p-5 border border-stone-100 mb-4 font-assistant">
                                 <div className="flex justify-between items-center text-center">
                                     <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
                                         <CalendarDays size={24} className="text-rose-500 mb-1.5" />
