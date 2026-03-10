@@ -1,12 +1,18 @@
 // Root Layout for Nursery Store
 import type { Metadata } from "next";
-import { Heebo } from "next/font/google";
+import { Heebo, Assistant } from "next/font/google";
 import "./globals.css";
 
 const heebo = Heebo({
   subsets: ["hebrew", "latin"],
   weight: ["300", "400", "500", "700", "900"],
   variable: "--font-heebo",
+});
+
+const assistant = Assistant({
+  subsets: ["hebrew", "latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-assistant",
 });
 
 export const metadata: Metadata = {
@@ -62,7 +68,7 @@ export default function RootLayout({
       <head>
         <meta name="google" content="notranslate" />
       </head>
-      <body className={`${heebo.variable} font-chalk text-[22px] antialiased bg-white text-gray-900`}>
+      <body className={`${heebo.variable} ${assistant.variable} font-chalk text-[22px] antialiased bg-white text-gray-900`}>
         {children}
       </body>
     </html>
