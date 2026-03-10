@@ -89,73 +89,67 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                                 priority
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:hidden" />
-
-                            {/* Mobile Price Overlay */}
-                            <div className="absolute bottom-6 left-6 md:hidden">
-                                <div className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-xl">
-                                    <span className="text-sm text-stone-500 font-bold block leading-none mb-1">מחיר</span>
-                                    <span className="text-2xl font-black text-emerald-700 leading-none">₪{plant.price}</span>
-                                </div>
-                            </div>
                         </div>
 
                         {/* Info Section */}
                         <div className="w-full md:w-7/12 flex flex-col p-5 md:p-10 overflow-y-auto scrollbar-hide">
                             {/* Header */}
-                            <div className="mb-8">
+                            <div className="mb-6 relative">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                    <span className="bg-emerald-100/80 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-assistant">
                                         {plant.category || 'צמחים'}
                                     </span>
                                     {plant.in_stock !== false && (
-                                        <span className="flex items-center gap-1 text-emerald-600 text-[10px] font-bold">
+                                        <span className="flex items-center gap-1 text-emerald-600 text-[10px] font-bold font-assistant">
                                             <CheckCircle2 size={12} />
                                             זמין במלאי
                                         </span>
                                     )}
                                 </div>
-                                <h2 className="text-4xl md:text-5xl font-chalk text-stone-800 leading-tight mb-2 tracking-wide">
-                                    {plant.name}
-                                </h2>
 
-                                <div className="md:block">
-                                    <span className="text-3xl font-chalk text-emerald-600 tracking-wider">₪{plant.price}</span>
-                                    <span className="text-stone-400 mr-2 text-[10px] uppercase font-bold tracking-widest hidden md:inline">מחיר קטלוגי</span>
+                                <div className="flex items-baseline justify-between transition-all">
+                                    <h2 className="text-4xl md:text-5xl font-chalk text-stone-800 leading-none tracking-wide">
+                                        {plant.name}
+                                    </h2>
+                                    <div className="shrink-0 text-left">
+                                        <span className="text-3xl md:text-4xl font-chalk text-emerald-600 tracking-wider">₪{plant.price}</span>
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Description - Brief paragraph */}
                             <div className="mb-6">
-                                <p className="text-stone-600 leading-snug text-lg font-assistant text-right font-medium">
-                                    {plant.description || "טרם עדכנו תיאור מפורט לצמח זה, אך אתם מוזמנים לשלוח הודעה לנתי ולהתייעץ על כל מה שחשוב!"}
+                                <p className="text-stone-600 leading-relaxed text-lg font-assistant text-right font-medium">
+                                    {plant.name.includes('אמנון ותמר') ?
+                                        "אמנון ותמר הוא אחד מפרחי החורף האהובים והצבעוניים ביותר. הוא מצטיין בפריחה שופעת במגוון צבעים מרהיבים, עמיד לקור היטב ומתאים מאוד לעציצים, אדניות או לשתילה בגינה ליצירת מרבדי צבע קסומים." :
+                                        (plant.description || "טרם עדכנו תיאור מפורט לצמח זה, אך אתם מוזמנים לשלוח הודעה לנתי ולהתייעץ על כל מה שחשוב!")
+                                    }
                                 </p>
                             </div>
 
                             {/* Care Grid - Compact Row */}
-                            <div className="bg-stone-50 rounded-2xl p-3 border border-stone-100 mb-6 font-assistant">
+                            <div className="bg-stone-50 rounded-2xl p-4 border border-stone-100 mb-6 font-assistant">
                                 <div className="flex justify-between items-center text-center">
                                     <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
-                                        <CalendarDays size={18} className="text-rose-500 mb-1" />
-                                        <span className="text-[10px] text-stone-400 font-bold mb-0.5">עונה</span>
-                                        <span className="text-[12px] font-bold text-stone-700 line-clamp-1 break-all">{plant.season || 'כל השנה'}</span>
+                                        <CalendarDays size={20} className="text-rose-500 mb-1.5" />
+                                        <span className="text-[14px] md:text-lg font-bold text-stone-700 leading-none">
+                                            {plant.name.includes('אמנון ותמר') ? 'חורף-אביב' : (plant.season || 'כל השנה')}
+                                        </span>
                                     </div>
 
                                     <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
-                                        <Sun size={18} className="text-amber-500 mb-1" />
-                                        <span className="text-[10px] text-stone-400 font-bold mb-0.5">שמש</span>
-                                        <span className="text-[12px] font-bold text-stone-700 line-clamp-1 break-all">{plant.light_needs || 'חצי צל'}</span>
+                                        <Sun size={20} className="text-amber-500 mb-1.5" />
+                                        <span className="text-[14px] md:text-lg font-bold text-stone-700 leading-none">{plant.light_needs || 'חצי צל'}</span>
                                     </div>
 
                                     <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
-                                        <Droplets size={18} className="text-blue-500 mb-1" />
-                                        <span className="text-[10px] text-stone-400 font-bold mb-0.5">השקיה</span>
-                                        <span className="text-[12px] font-bold text-stone-700 line-clamp-1 break-all">{plant.water_needs || 'בינונית'}</span>
+                                        <Droplets size={20} className="text-blue-500 mb-1.5" />
+                                        <span className="text-[14px] md:text-lg font-bold text-stone-700 leading-none">{plant.water_needs || 'בינונית'}</span>
                                     </div>
 
                                     <div className="flex-1 flex flex-col items-center">
-                                        <TreePine size={18} className="text-emerald-500 mb-1" />
-                                        <span className="text-[10px] text-stone-400 font-bold mb-0.5">קושי</span>
-                                        <span className="text-[12px] font-bold text-stone-700 line-clamp-1 break-all">{plant.care_level || 'קל'}</span>
+                                        <TreePine size={20} className="text-emerald-500 mb-1.5" />
+                                        <span className="text-[14px] md:text-lg font-bold text-stone-700 leading-none">{plant.care_level || 'קל'}</span>
                                     </div>
                                 </div>
                             </div>
