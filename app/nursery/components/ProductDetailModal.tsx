@@ -38,16 +38,38 @@ interface ProductDetailModalProps {
 }
 
 export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDetailModalProps) {
+    const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        if (plant) {
+            setSelectedImage(plant.image_url || 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?q=80&w=500&auto=format&fit=crop');
+        }
+    }, [plant]);
+
     if (!plant) return null;
 
-    const defaultImage = 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?q=80&w=500&auto=format&fit=crop';
-    const imageUrl = plant.image_url || defaultImage;
+    const imageUrl = selectedImage || plant.image_url || 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?q=80&w=500&auto=format&fit=crop';
 
     // Helper for WhatsApp link
     const openWhatsApp = () => {
-        const text = `שלום נתי, אשמח לקבל פרטים נוספים על הצמח: ${plant.name}`;
+        const text = `שלום נתי, אשמח לקבל פרטים נוספים על הצמח: ${plant.name}${selectedImage ? ' (צבע שנבחר בתמונה)' : ''}`;
         window.open(`https://wa.me/972556822072?text=${encodeURIComponent(text)}`, '_blank');
     };
+
+    // Variations logic (Hardcoded for Pansy for now based on user request)
+    const getVariations = () => {
+        if (plant.name.includes('אמנון ותמר')) {
+            return [
+                { label: 'סגול-כחול', image: '/plant-images/pansy/blue.png', color: '#4c1d95' },
+                { label: 'צהוב', image: '/plant-images/pansy/yellow.png', color: '#fbbf24' },
+                { label: 'לבן-סגול', image: '/plant-images/pansy/white.png', color: '#f8fafc' },
+                { label: 'כתום-אדום', image: '/plant-images/pansy/orange.png', color: '#ea580c' }
+            ];
+        }
+        return [];
+    };
+
+    const variations = getVariations();
 
     return (
         <AnimatePresence>
@@ -78,15 +100,23 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                         </button>
 
                         {/* Image Section */}
-                        <div className="w-full md:w-5/12 h-56 md:h-auto relative bg-stone-100 shrink-0">
-                            <Image
-                                src={imageUrl}
-                                alt={plant.name}
-                                fill
-                                className="object-cover"
-                                sizes="(max-width: 768px) 100vw, 50vw"
-                                priority
-                            />
+                        <div className="w-full md:w-5/12 h-56 md:h-auto relative bg-stone-100 shrink-0 overflow-hidden">
+                            <motion.div
+                                key={imageUrl}
+                                initial={{ opacity: 0.5, scale: 1.05 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.4 }}
+                                className="w-full h-full relative"
+                            >
+                                <Image
+                                    src={imageUrl}
+                                    alt={plant.name}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    priority
+                                />
+                            </motion.div>
                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:hidden" />
                         </div>
 
@@ -98,11 +128,20 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                                     <span className="bg-emerald-100/80 text-emerald-700 px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-assistant">
                                         {plant.category || 'צמחים'}
                                     </span>
-                                    {plant.in_stock !== false && (
-                                        <span className="flex items-center gap-1 text-emerald-600 text-[10px] font-bold font-assistant">
-                                            <CheckCircle2 size={12} />
-                                            זמין
-                                        </span>
+
+                                    {/* Color Variations Tags */}
+                                    {variations.length > 0 && (
+                                        <div className="flex gap-1.5 mr-auto">
+                                            {variations.map((v) => (
+                                                <button
+                                                    key={v.label}
+                                                    onClick={() => setSelectedImage(v.image)}
+                                                    className={`w-4 h-4 rounded-full border border-stone-200 transition-all ${selectedImage === v.image ? 'ring-2 ring-emerald-500 ring-offset-1 scale-110' : 'hover:scale-110'}`}
+                                                    style={{ backgroundColor: v.color }}
+                                                    title={v.label}
+                                                />
+                                            ))}
+                                        </div>
                                     )}
                                 </div>
 
