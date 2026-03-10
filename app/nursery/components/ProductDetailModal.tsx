@@ -117,7 +117,7 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                             </div>
 
                             {/* Description - Compacted to save space for larger image */}
-                            <div className="mb-4">
+                            <div className="mb-2">
                                 <p className="text-stone-600 leading-relaxed text-lg md:text-xl font-assistant text-right font-medium">
                                     {plant.name.includes('אמנון ותמר') ?
                                         "אמנון ותמר הוא אחד מפרחי החורף האהובים והצבעוניים ביותר. הוא מצטיין בפריחה שופעת במגוון צבעים מרהיבים, עמיד לקור היטב ומתאים מאוד לעציצים ואדניות." :
@@ -126,35 +126,35 @@ export default function ProductDetailModal({ isOpen, onClose, plant }: ProductDe
                                 </p>
                             </div>
 
-                            {/* Care Grid - Tightened for larger image */}
-                            <div className="bg-stone-50 rounded-2xl p-5 border border-stone-100 mb-4 font-assistant">
-                                <div className="flex justify-between items-center text-center">
+                            {/* Care Grid - Clean & Expanded Width */}
+                            <div className="mb-2 font-assistant">
+                                <div className="flex justify-between items-center text-center py-2">
                                     <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
-                                        <CalendarDays size={24} className="text-rose-500 mb-1.5" />
+                                        <CalendarDays size={26} className="text-rose-500 mb-1.5" />
                                         <span className="text-[15px] md:text-xl font-bold text-stone-700 leading-none">
                                             {plant.name.includes('אמנון ותמר') ? 'חורף-אביב' : (plant.season || 'כל השנה')}
                                         </span>
                                     </div>
 
                                     <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
-                                        <Sun size={24} className="text-amber-500 mb-1.5" />
+                                        <Sun size={26} className="text-amber-500 mb-1.5" />
                                         <span className="text-[15px] md:text-xl font-bold text-stone-700 leading-none">{plant.light_needs || 'חצי צל'}</span>
                                     </div>
 
                                     <div className="flex-1 flex flex-col items-center border-l border-stone-200/50 last:border-0">
-                                        <Droplets size={24} className="text-blue-500 mb-1.5" />
+                                        <Droplets size={26} className="text-blue-500 mb-1.5" />
                                         <span className="text-[15px] md:text-xl font-bold text-stone-700 leading-none">{plant.water_needs || 'בינונית'}</span>
                                     </div>
 
                                     <div className="flex-1 flex flex-col items-center">
-                                        <Zap size={24} className="text-emerald-500 mb-1.5" />
+                                        <Zap size={26} className="text-emerald-500 mb-1.5" />
                                         <span className="text-[15px] md:text-xl font-bold text-stone-700 leading-none">{plant.care_level || 'קל'}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* CTA Section */}
-                            <div className="mt-auto pt-3 border-t border-stone-100">
+                            <div className="mt-auto pt-2 border-t border-stone-100">
                                 <button
                                     onClick={openWhatsApp}
                                     className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3.5 rounded-xl font-bold text-lg md:text-xl transition-all shadow-lg active:scale-[0.98] font-assistant flex items-center justify-center gap-3"
